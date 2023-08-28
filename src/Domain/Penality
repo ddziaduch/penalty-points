@@ -1,0 +1,15 @@
+<?php
+
+declare(strict_types=1);
+
+namespace ddziaduch\PenalityPoints\Domain;
+
+final readonly class Penality
+{
+	public function __construct(
+		public DateTimeInterface $createdAt,
+		public int $numberOfPoints,
+	) {
+
+	}
+}
