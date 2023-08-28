@@ -10,6 +10,5 @@ final readonly class Penality
 		public DateTimeInterface $createdAt,
 		public int $numberOfPoints,
 	) {
-
 	}
 }
