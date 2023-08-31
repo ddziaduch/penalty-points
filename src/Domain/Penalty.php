@@ -10,4 +10,9 @@ final readonly class Penalty
         public \DateTimeImmutable $createdAt,
         public int $numberOfPoints,
     ) {}
+
+    public function isValid(\DateTimeImmutable $now): bool
+    {
+        return $this->createdAt->diff($now)->y <= 2;
+    }
 }

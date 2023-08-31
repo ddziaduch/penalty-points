@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace ddziaduch\PenaltyPoints\Domain;
 
-final class Driver
+final class DriverFile
 {
     /** @var Penalty[] */
     private array $penalties;
 
     public function __construct(
-        private \DateTimeImmutable $examPassedAt,
+        private readonly \DateTimeImmutable $examPassedAt,
         Penalty ...$penalties,
     ) {
         $this->penalties = $penalties;
@@ -23,12 +23,20 @@ final class Driver
 
     public function isPenaltyPointsLimitExceeded(\DateTimeImmutable $now): bool
     {
+        $got = 0;
 
+        foreach ($this->penalties as $penalty) {
+            if ($penalty->isValid($now)) {
+                $got += $penalty->numberOfPoints;
+            }
+        }
+
+        return $got > $this->maxNumberOfPenaltyPoints($now);
     }
 
     public function maxNumberOfPenaltyPoints(\DateTimeImmutable $now): int
     {
-        if ($now->diff($this->examPassedAt)->y >= 1) {
+        if ($this->examPassedAt->diff($now)->y >= 1) {
             return 24;
         }
 
