@@ -2,36 +2,36 @@
 
 declare(strict_types=1);
 
-namespace ddziaduch\PenalityPoints\Domain;
+namespace ddziaduch\PenaltyPoints\Domain;
 
 final class Driver
 {
-	/** @var Penalities[] */
-	private array $penalities;
+    /** @var Penalty[] */
+    private array $penalties;
 
-	public function __construct(
-		private DateTimeImmutable $examPassedAt,
-		Penality ...$penalities,
-	) {
-		$this->penalities = $penalities;
-	}
+    public function __construct(
+        private \DateTimeImmutable $examPassedAt,
+        Penalty ...$penalties,
+    ) {
+        $this->penalties = $penalties;
+    }
 
-	public function addPenality(Penality $penality): void
-	{
-		$this->penalities[] = $penality;
-	}
+    public function imposePenalty(Penalty $penalty): void
+    {
+        $this->penalties[] = $penalty;
+    }
 
-	public function isLimitExceeded(DateTimeImmutable $now): bool
-	{
-		
-	}
+    public function isPenaltyPointsLimitExceeded(\DateTimeImmutable $now): bool
+    {
 
-	public function maxLimit(DateTimeImmutable $now): int
-	{
-		if ($now->diff($this->examPassedAt)->y >= 1) {
-			return 24;
-		}
+    }
 
-		return 20;
-	}
+    public function maxNumberOfPenaltyPoints(\DateTimeImmutable $now): int
+    {
+        if ($now->diff($this->examPassedAt)->y >= 1) {
+            return 24;
+        }
+
+        return 20;
+    }
 }
