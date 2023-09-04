@@ -21,7 +21,12 @@ final class DriverFile
         $this->penalties[] = $penalty;
     }
 
-    public function isPenaltyPointsLimitExceeded(\DateTimeImmutable $now): bool
+    public function isDrivingLicenseValid(\DateTimeImmutable $now): bool
+    {
+        return $this->sumOfValidPenaltyPoints($now) <= $this->maxNumberOfPenaltyPoints($now);
+    }
+
+    public function sumOfValidPenaltyPoints(\DateTimeImmutable $now): int
     {
         $got = 0;
 
@@ -30,8 +35,7 @@ final class DriverFile
                 $got += $penalty->numberOfPoints;
             }
         }
-
-        return $got > $this->maxNumberOfPenaltyPoints($now);
+        return $got;
     }
 
     public function maxNumberOfPenaltyPoints(\DateTimeImmutable $now): int

@@ -13,6 +13,6 @@ final readonly class Penalty
 
     public function isValid(\DateTimeImmutable $now): bool
     {
-        return $this->createdAt->diff($now)->y <= 2;
+        return $this->createdAt->diff($now)->y < 2;
     }
 }

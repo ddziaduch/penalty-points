@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class DriverFileTest extends TestCase
 {
-    /** @dataProvider provideDataFromMaxNumberOfPenaltyPoints */
+    /** @dataProvider provideDataForMaxNumberOfPenaltyPoints */
     public function testMaxNumberOfPenaltyPoints(
         \DateTimeImmutable $examPassedAt,
         \DateTimeImmutable $now,
@@ -27,7 +27,7 @@ final class DriverFileTest extends TestCase
         );
     }
 
-    public static function provideDataFromMaxNumberOfPenaltyPoints(): iterable
+    public static function provideDataForMaxNumberOfPenaltyPoints(): iterable
     {
         $examPassedAt = new \DateTimeImmutable('2000-01-01T12:00:00Z');
 
@@ -55,18 +55,17 @@ final class DriverFileTest extends TestCase
      *
      * @param Penalty[] $previousPenalties
      */
-    public function testIsPenaltyPointsLimitExceeded(
-        Penalty $newPenalty,
+    public function testIsDrivingLicenseValid(
         \DateTimeImmutable $examPassedAt,
-        \DateTimeImmutable $now,
+        array $previousPenalties,
+        Penalty $newPenalty,
         bool $expectedReturnValue,
-        array $previousPenalties
     ): void {
         $driverFile = new DriverFile($examPassedAt, ...$previousPenalties);
         $driverFile->imposePenalty($newPenalty);
         self::assertSame(
             $expectedReturnValue,
-            $driverFile->isPenaltyPointsLimitExceeded($now),
+            $driverFile->isDrivingLicenseValid($newPenalty->createdAt),
         );
     }
 
@@ -74,30 +73,86 @@ final class DriverFileTest extends TestCase
     {
         $examPassedAt = new \DateTimeImmutable('2020-05-29T04:30:00Z');
 
+        // exam passed less than year ago cases
         yield 'exam passed less than year ago, got already 19 penalty points, just got new 2 penalty points' => [
-            'newPenalty' => new Penalty($examPassedAt->modify('+11 months'), 2),
             'examPassedAt' => $examPassedAt,
-            'now' => $examPassedAt->modify('+11 months'),
-            'expectedReturnValue' => true,
             'previousPenalties' => [
                 new Penalty($examPassedAt->modify('+1 month'), 10),
                 new Penalty($examPassedAt->modify('+3 month'), 6),
                 new Penalty($examPassedAt->modify('+6 month'), 3),
             ],
+            'newPenalty' => new Penalty($examPassedAt->modify('+11 months'), 2),
+            'expectedReturnValue' => false,
         ];
 
         yield 'exam passed less than year ago, got already 18 penalty points, just got new 2 penalty points' => [
-            'newPenalty' => new Penalty($examPassedAt->modify('+11 months'), 2),
             'examPassedAt' => $examPassedAt,
-            'now' => $examPassedAt->modify('+11 months'),
-            'expectedReturnValue' => false,
             'previousPenalties' => [
                 new Penalty($examPassedAt->modify('+1 month'), 10),
                 new Penalty($examPassedAt->modify('+3 month'), 6),
                 new Penalty($examPassedAt->modify('+6 month'), 2),
             ],
+            'newPenalty' => new Penalty($examPassedAt->modify('+11 months'), 2),
+            'expectedReturnValue' => true,
         ];
 
-        // TODO: add more cases
+        // exam passed more than year ago cases
+        yield 'exam passed more than year ago, got already 19 penalty points, just got new 2 penalty points' => [
+            'examPassedAt' => $examPassedAt,
+            'previousPenalties' => [
+                new Penalty($examPassedAt->modify('+1 month'), 10),
+                new Penalty($examPassedAt->modify('+3 month'), 9),
+            ],
+            'newPenalty' => new Penalty($examPassedAt->modify('+15 months'), 2),
+            'expectedReturnValue' => true,
+        ];
+
+        yield 'exam passed less than year ago, got already 18 penalty points, just got new 6 penalty points' => [
+            'examPassedAt' => $examPassedAt,
+            'previousPenalties' => [
+                new Penalty($examPassedAt->modify('+1 month'), 10),
+                new Penalty($examPassedAt->modify('+3 month'), 3),
+                new Penalty($examPassedAt->modify('+4 month'), 3),
+                new Penalty($examPassedAt->modify('+6 month'), 2),
+            ],
+            'newPenalty' => new Penalty($examPassedAt->modify('+18 months'), 6),
+            'expectedReturnValue' => true,
+        ];
+
+        yield 'exam passed less than year ago, got already 18 penalty points, just got new 10 penalty points' => [
+            'examPassedAt' => $examPassedAt,
+            'previousPenalties' => [
+                new Penalty($examPassedAt->modify('+1 month'), 10),
+                new Penalty($examPassedAt->modify('+3 month'), 3),
+                new Penalty($examPassedAt->modify('+4 month'), 3),
+                new Penalty($examPassedAt->modify('+6 month'), 2),
+            ],
+            'newPenalty' => new Penalty($examPassedAt->modify('+18 months'), 10),
+            'expectedReturnValue' => false,
+        ];
+
+        // expired penalties cases
+        yield 'exam passed more than year ago, got already 18 penalty points, where 6 are expired, just got new 10 penalty points' => [
+            'examPassedAt' => $examPassedAt,
+            'previousPenalties' => [
+                new Penalty($examPassedAt->modify('+1 month'), 6),
+                new Penalty($examPassedAt->modify('+13 month'), 10),
+                new Penalty($examPassedAt->modify('+26 month'), 2),
+            ],
+            'newPenalty' => new Penalty($examPassedAt->modify('+36 months'), 10),
+            'expectedReturnValue' => true,
+        ];
+
+        yield 'exam passed more than year ago, got already 24 penalty points, where 2 are expired, just got new 10 penalty points' => [
+            'examPassedAt' => $examPassedAt,
+            'previousPenalties' => [
+                new Penalty($examPassedAt->modify('+1 month'), 2),
+                new Penalty($examPassedAt->modify('+13 month'), 10),
+                new Penalty($examPassedAt->modify('+16 month'), 10),
+                new Penalty($examPassedAt->modify('+26 month'), 2),
+            ],
+            'newPenalty' => new Penalty($examPassedAt->modify('+36 months'), 10),
+            'expectedReturnValue' => false,
+        ];
     }
 }
