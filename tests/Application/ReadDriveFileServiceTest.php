@@ -38,7 +38,7 @@ class ReadDriveFileServiceTest extends TestCase
 
         $this->now = new \DateTimeImmutable();
 
-        $this->driverFile = new DriverFile($this->now->modify('-24 months'));
+        $this->driverFile = new DriverFile('12345', $this->now->modify('-24 months'));
         $this->driverFile->imposePenalty(new Penalty($this->now->modify('-6 months'), 10));
     }
 

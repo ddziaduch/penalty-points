@@ -10,7 +10,8 @@ final class DriverFile
     private array $penalties;
 
     public function __construct(
-        private readonly \DateTimeImmutable $examPassedAt,
+        public readonly string $licenseNumber,
+        public readonly \DateTimeImmutable $examPassedAt,
         Penalty ...$penalties,
     ) {
         $this->penalties = $penalties;
@@ -28,14 +29,14 @@ final class DriverFile
 
     public function sumOfValidPenaltyPoints(\DateTimeImmutable $now): int
     {
-        $got = 0;
+        $sum = 0;
 
         foreach ($this->penalties as $penalty) {
             if ($penalty->isValid($now)) {
-                $got += $penalty->numberOfPoints;
+                $sum += $penalty->numberOfPoints;
             }
         }
-        return $got;
+        return $sum;
     }
 
     public function maxNumberOfPenaltyPoints(\DateTimeImmutable $now): int

@@ -20,7 +20,7 @@ final class DriverFileTest extends TestCase
         \DateTimeImmutable $now,
         int $expectedNumberOfPenaltyPoints,
     ): void {
-        $driver = new DriverFile($examPassedAt);
+        $driver = new DriverFile('12345', $examPassedAt);
         self::assertSame(
             $expectedNumberOfPenaltyPoints,
             $driver->maxNumberOfPenaltyPoints($now),
@@ -61,7 +61,7 @@ final class DriverFileTest extends TestCase
         Penalty $newPenalty,
         bool $expectedReturnValue,
     ): void {
-        $driverFile = new DriverFile($examPassedAt, ...$previousPenalties);
+        $driverFile = new DriverFile('12345', $examPassedAt, ...$previousPenalties);
         $driverFile->imposePenalty($newPenalty);
         self::assertSame(
             $expectedReturnValue,
