@@ -6,7 +6,7 @@ namespace ddziaduch\PenaltyPoints\Application\Ports\Secondary;
 
 use ddziaduch\PenaltyPoints\Domain\DriverFile;
 
-interface DriveFileRepository
+interface GetDriverFile
 {
     public function get(string $drivingLicenceNumber): DriverFile;
 }
