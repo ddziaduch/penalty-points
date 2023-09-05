@@ -8,6 +8,8 @@ final class DriverFile
 {
     /** @var Penalty[] */
     private array $penalties;
+    /** @var object[] */
+    private array $events;
 
     public function __construct(
         public readonly string $licenseNumber,
@@ -20,6 +22,11 @@ final class DriverFile
     public function imposePenalty(Penalty $penalty): void
     {
         $this->penalties[] = $penalty;
+        $this->events[] = new PenaltyImposed($this->licenseNumber, $penalty);
+
+        if (!$this->isDrivingLicenseValid($penalty->createdAt)) {
+            $this->events[] = new DrivingLicenseNoLongerValid($this->licenseNumber);
+        }
     }
 
     public function isDrivingLicenseValid(\DateTimeImmutable $now): bool
@@ -36,6 +43,7 @@ final class DriverFile
                 $sum += $penalty->numberOfPoints;
             }
         }
+
         return $sum;
     }
 
@@ -46,5 +54,14 @@ final class DriverFile
         }
 
         return 20;
+    }
+
+    /** @return object[] */
+    public function dumpEvents(): array
+    {
+        $events = $this->events;
+        $this->events = [];
+
+        return $events;
     }
 }

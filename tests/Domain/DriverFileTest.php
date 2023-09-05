@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace ddziaduch\PenaltyPoints\Tests\Domain;
 
 use ddziaduch\PenaltyPoints\Domain\DriverFile;
+use ddziaduch\PenaltyPoints\Domain\DrivingLicenseNoLongerValid;
 use ddziaduch\PenaltyPoints\Domain\Penalty;
+use ddziaduch\PenaltyPoints\Domain\PenaltyImposed;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -51,7 +53,7 @@ final class DriverFileTest extends TestCase
     }
 
     /**
-     * @dataProvider isPenaltyPointsLimitExceededDataProvider
+     * @dataProvider isDrivingLicenseValidDataProvider
      *
      * @param Penalty[] $previousPenalties
      */
@@ -69,7 +71,7 @@ final class DriverFileTest extends TestCase
         );
     }
 
-    public static function isPenaltyPointsLimitExceededDataProvider(): iterable
+    public static function isDrivingLicenseValidDataProvider(): iterable
     {
         $examPassedAt = new \DateTimeImmutable('2020-05-29T04:30:00Z');
 
@@ -154,5 +156,30 @@ final class DriverFileTest extends TestCase
             'newPenalty' => new Penalty($examPassedAt->modify('+36 months'), 10),
             'expectedReturnValue' => false,
         ];
+    }
+
+    public function testImposePenaltyWhileNotExceedingPointsLimit(): void
+    {
+        $now = new \DateTimeImmutable();
+        $driverFile = new DriverFile('12345', $now->modify('-36 months'));
+        $driverFile->imposePenalty(new Penalty($now, 10));
+        $events = $driverFile->dumpEvents();
+        self::assertCount(1, $events);
+        self::assertInstanceOf(PenaltyImposed::class, $events[0] ?? null);
+    }
+
+    public function testImposePenaltyWhileExceedingPointsLimit(): void
+    {
+        $now = new \DateTimeImmutable();
+        $driverFile = new DriverFile('12345', $now->modify('-36 months'));
+        $driverFile->imposePenalty(new Penalty($now->modify('-10 months'), 10));
+        $driverFile->imposePenalty(new Penalty($now->modify('-6 months'), 10));
+        $driverFile->imposePenalty(new Penalty($now->modify('-3 months'), 10));
+        $events = $driverFile->dumpEvents();
+        self::assertCount(4, $events);
+        self::assertInstanceOf(PenaltyImposed::class, $events[0] ?? null);
+        self::assertInstanceOf(PenaltyImposed::class, $events[1] ?? null);
+        self::assertInstanceOf(PenaltyImposed::class, $events[2] ?? null);
+        self::assertInstanceOf(DrivingLicenseNoLongerValid::class, $events[3] ?? null);
     }
 }
