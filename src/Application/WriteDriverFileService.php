@@ -13,7 +13,6 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 
 final readonly class WriteDriverFileService implements WriteDriverFile
 {
-
     public function __construct(
         private ClockInterface $clock,
         private GetDriverFile $getDriverFile,

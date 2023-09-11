@@ -11,6 +11,7 @@ use ddziaduch\PenaltyPoints\Domain\Penalty;
 use PHPUnit\Framework\TestCase;
 use Psr\Clock\ClockInterface;
 
+/** @covers \ddziaduch\PenaltyPoints\Application\ReadDriveFileService */
 class ReadDriveFileServiceTest extends TestCase
 {
     private \DateTimeImmutable $now;
