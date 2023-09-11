@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace ddziaduch\PenaltyPoints\Application;
 
-use ddziaduch\PenaltyPoints\Application\Ports\Primary\WriteDriverFile;
+use ddziaduch\PenaltyPoints\Application\Ports\Primary\ImposePenalty;
 use ddziaduch\PenaltyPoints\Application\Ports\Secondary\GetDriverFile;
 use ddziaduch\PenaltyPoints\Application\Ports\Secondary\StoreDriverFile;
 use ddziaduch\PenaltyPoints\Domain\Penalty;
 use Psr\Clock\ClockInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 
-final readonly class WriteDriverFileService implements WriteDriverFile
+final readonly class ImposePenaltyService implements ImposePenalty
 {
     public function __construct(
         private ClockInterface $clock,
@@ -20,9 +20,9 @@ final readonly class WriteDriverFileService implements WriteDriverFile
         private StoreDriverFile $storeDriverFile,
     ) {}
 
-    public function imposePenalty(
+    public function impose(
         string $driverLicenseNumber,
-        int $numberOfPoints
+        int $numberOfPoints,
     ): void {
         $driverFile = $this->getDriverFile->get($driverLicenseNumber);
         $now = $this->clock->now();
