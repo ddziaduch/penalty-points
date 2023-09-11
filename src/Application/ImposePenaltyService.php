@@ -30,7 +30,8 @@ final readonly class ImposePenaltyService implements ImposePenalty
 
         $driverFile->imposePenalty($penalty);
 
-        foreach ($driverFile->dumpEvents() as $event) {
+        $events = $driverFile->dumpEvents();
+        foreach ($events as $event) {
             $this->eventDispatcher->dispatch($event);
         }
 
