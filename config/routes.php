@@ -9,9 +9,9 @@ use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 return static function (RoutingConfigurator $configurator): void {
     $configurator->add(
         ImposePenaltyHttpAdapter::class,
-        '/impose-penalty/driver/{driverLicenseNumber}/points/{numberOfPoints}',
+        'impose-penalty/driver/{driverLicenseNumber}/points/{numberOfPoints}',
     )->requirements([
-        'driverLicenseNumber' => '[a-zA-Z0-9]+',
-        'numberOfPoints' => '/d+'
+        'driverLicenseNumber' => '\d+/\d+/\d+',
+        'numberOfPoints' => '\d+'
     ])->methods([Request::METHOD_POST])->controller(ImposePenaltyHttpAdapter::class);
 };

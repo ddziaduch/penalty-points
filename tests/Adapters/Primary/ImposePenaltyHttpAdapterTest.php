@@ -9,7 +9,8 @@ use ddziaduch\PenaltyPoints\Application\Ports\Primary\ImposePenalty;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
 
-final  class ImposePenaltyHttpAdapterTest extends TestCase
+/** @covers \ddziaduch\PenaltyPoints\Adapters\Primary\ImposePenaltyHttpAdapter */
+final class ImposePenaltyHttpAdapterTest extends TestCase
 {
     public function testInvokesPortAndReturnsEmptyResponse(): void
     {
