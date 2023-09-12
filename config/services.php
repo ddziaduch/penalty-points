@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use ddziaduch\PenaltyPoints\Adapters\Primary\ImposePenaltyCliAdapter;
 use ddziaduch\PenaltyPoints\Adapters\Primary\ImposePenaltyHttpAdapter;
 use ddziaduch\PenaltyPoints\Adapters\Secondary\Clock;
 use ddziaduch\PenaltyPoints\Adapters\Secondary\InMemoryDriverFiles;
@@ -29,4 +30,8 @@ return static function (ContainerConfigurator $configurator): void {
     $services->set(ImposePenaltyHttpAdapter::class)->args([
         service(ImposePenalty::class),
     ])->tag('controller.service_arguments');
+
+    $services->set(ImposePenaltyCliAdapter::class)->args([
+        service(ImposePenalty::class),
+    ])->tag('console.command');
 };
