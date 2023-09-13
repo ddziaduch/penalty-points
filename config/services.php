@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use ddziaduch\PenaltyPoints\Adapters\Primary\ImposePenaltyCliAdapter;
 use ddziaduch\PenaltyPoints\Adapters\Primary\ImposePenaltyHttpAdapter;
-use ddziaduch\PenaltyPoints\Adapters\Secondary\Clock;
+use ddziaduch\PenaltyPoints\Adapters\Secondary\SystemClock;
 use ddziaduch\PenaltyPoints\Adapters\Secondary\InMemoryDriverFiles;
 use ddziaduch\PenaltyPoints\Application\ImposePenaltyService;
 use ddziaduch\PenaltyPoints\Application\Ports\Primary\ImposePenalty;
@@ -17,7 +17,7 @@ return static function (ContainerConfigurator $configurator): void {
 
     $services->defaults()->autowire(false)->autoconfigure(false);
 
-    $services->set(ClockInterface::class, Clock::class);
+    $services->set(ClockInterface::class, SystemClock::class);
     $services->set(InMemoryDriverFiles::class);
 
     $services->set(ImposePenalty::class, ImposePenaltyService::class)->args([

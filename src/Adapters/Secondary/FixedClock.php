@@ -7,10 +7,14 @@ namespace ddziaduch\PenaltyPoints\Adapters\Secondary;
 use DateTimeImmutable;
 use Psr\Clock\ClockInterface;
 
-final readonly class Clock implements ClockInterface
+final readonly class FixedClock implements ClockInterface
 {
+    public function __construct(private DateTimeImmutable $now)
+    {
+    }
+
     public function now(): DateTimeImmutable
     {
-        return new DateTimeImmutable();
+        return $this->now;
     }
 }

@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace ddziaduch\PenaltyPoints\Tests\Application;
 
+use ddziaduch\PenaltyPoints\Adapters\Secondary\FixedClock;
 use ddziaduch\PenaltyPoints\Application\Ports\Secondary\GetDriverFile;
 use ddziaduch\PenaltyPoints\Application\ReadDriveFileService;
 use ddziaduch\PenaltyPoints\Domain\DriverFile;
 use ddziaduch\PenaltyPoints\Domain\Penalty;
 use PHPUnit\Framework\TestCase;
-use Psr\Clock\ClockInterface;
 
 /** @covers \ddziaduch\PenaltyPoints\Application\ReadDriveFileService */
 class ReadDriveFileServiceTest extends TestCase
@@ -45,8 +45,7 @@ class ReadDriveFileServiceTest extends TestCase
 
     private function readDriverFileService(): ReadDriveFileService
     {
-        $clock = self::createStub(ClockInterface::class);
-        $clock->method('now')->willReturn($this->now);
+        $clock = new FixedClock($this->now);
 
         $getDriverFilePort = self::createStub(GetDriverFile::class);
         $getDriverFilePort->method('get')->willReturn($this->driverFile);
