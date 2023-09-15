@@ -8,7 +8,7 @@ use ddziaduch\PenaltyPoints\Application\Ports\Primary\PoliceOfficer;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
-/** @covers \ddziaduch\PenaltyPoints\Adapters\Primary\PoliceOfficerHttpAdapter */
+/** @covers \ddziaduch\PenaltyPoints\Adapters\Primary\PoliceOfficerImposePenaltyHttpAdapter */
 final class PoliceOfficerHttpAdapterTest extends WebTestCase
 {
     private const DRIVER_LICENSE_NUMBER = '11111/22/3333';

@@ -23,6 +23,7 @@ final class DriverFile
         bool $isPaid,
         int $numberOfPoints
     ): void {
+        // TODO: split into two methods, paid and unpaid
         if (!$this->isDrivingLicenseValid($occurredAt)) {
             throw new \DomainException('Can not impose penalty, drivers licence is not valid anymore!');
         }

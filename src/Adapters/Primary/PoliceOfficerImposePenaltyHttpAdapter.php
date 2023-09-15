@@ -7,17 +7,17 @@ namespace ddziaduch\PenaltyPoints\Adapters\Primary;
 use ddziaduch\PenaltyPoints\Application\Ports\Primary\PoliceOfficer;
 use Symfony\Component\HttpFoundation\Response;
 
-final readonly class PoliceOfficerHttpAdapter
+final readonly class PoliceOfficerImposePenaltyHttpAdapter
 {
     public function __construct(
-        private PoliceOfficer $imposePenalty,
+        private PoliceOfficer $policeOfficer,
     ) {}
 
     public function __invoke(
         string $driverLicenseNumber,
         int $numberOfPoints,
     ): Response {
-        $this->imposePenalty->imposePenalty($driverLicenseNumber, false, $numberOfPoints);
+        $this->policeOfficer->imposePenalty($driverLicenseNumber, false, $numberOfPoints);
 
         return new Response(status: Response::HTTP_NO_CONTENT);
     }

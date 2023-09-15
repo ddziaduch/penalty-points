@@ -11,11 +11,11 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-#[AsCommand(name: 'app:impose-penalty', description: 'Allows to impose a new penalty to the driver')]
-final class PoliceOfficerCliAdapter extends Command
+#[AsCommand(name: 'police-officer:impose-penalty', description: 'Allows to impose a new penalty to the driver')]
+final class PoliceOfficerImposePenaltyCliAdapter extends Command
 {
     public function __construct(
-        private readonly PoliceOfficer $imposePenalty,
+        private readonly PoliceOfficer $policeOfficer,
     ) {
         parent::__construct();
     }
@@ -37,7 +37,7 @@ final class PoliceOfficerCliAdapter extends Command
             return self::INVALID;
         }
 
-        $this->imposePenalty->imposePenalty(
+        $this->policeOfficer->imposePenalty(
             $input->getArgument('driverLicenseNumber'),
             $input->getArgument('isPaid'),
             (int) $numberOfPoints,
