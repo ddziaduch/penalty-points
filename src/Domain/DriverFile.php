@@ -15,23 +15,33 @@ final class DriverFile
     ) {
     }
 
-    public function imposePenalty(\DateTimeImmutable $now, bool $isPaid, int $numberOfPoints): void
-    {
-        if (!$this->isDrivingLicenseValid($now)) {
+    public function imposePenalty(
+        string $series,
+        int $number,
+        \DateTimeImmutable $occurredAt,
+        bool $isPaid,
+        int $numberOfPoints
+    ): void {
+        if (!$this->isDrivingLicenseValid($occurredAt)) {
             throw new \DomainException('Can not impose penalty, drivers licence is not valid anymore!');
         }
 
         $this->penalties[] = new Penalty(
-            occurredAt: $now,
-            payedAt: $isPaid ? $now : null,
+            series: $series,
+            number: $number,
+            occurredAt: $occurredAt,
+            payedAt: $isPaid ? $occurredAt : null,
             numberOfPoints: $numberOfPoints,
         );
     }
 
-    public function payPenalty(\DateTimeImmutable $penaltyOccurredAt, \DateTimeImmutable $now): void
-    {
+    public function payPenalty(
+        string $series,
+        int $number,
+        \DateTimeImmutable $now,
+    ): void {
         foreach ($this->penalties as $penalty) {
-            if ($penalty->occurredAt === $penaltyOccurredAt) {
+            if ($penalty->series === $series && $penalty->number === $number) {
                 $penalty->payedAt = $now;
 
                 return;

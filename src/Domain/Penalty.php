@@ -6,7 +6,10 @@ namespace ddziaduch\PenaltyPoints\Domain;
 
 final class Penalty
 {
+
     public function __construct(
+        public readonly string $series,
+        public readonly int $number,
         public readonly \DateTimeImmutable $occurredAt,
         public ?\DateTimeImmutable $payedAt,
         public readonly int $numberOfPoints,

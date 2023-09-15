@@ -40,7 +40,9 @@ class ReadDriveFileServiceTest extends TestCase
 
         $this->driverFile = new DriverFile('12345', $this->now->modify('-24 months'));
         $this->driverFile->imposePenalty(
-            now: $this->now->modify('-6 months'),
+            'CS',
+            12345,
+            occurredAt: $this->now->modify('-6 months'),
             isPaid: false,
             numberOfPoints: 10,
         );

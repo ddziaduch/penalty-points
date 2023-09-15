@@ -25,7 +25,7 @@ final readonly class PoliceOfficerService implements PoliceOfficer
         $now = $this->clock->now();
         $driverFile = $this->getDriverFile->get($driverLicenseNumber);
 
-        $driverFile->imposePenalty($now, $isPaid, $numberOfPoints);
+        $driverFile->imposePenalty('CS', 12345, $now, $isPaid, $numberOfPoints);
         $this->storeDriverFile->store($driverFile);
     }
 }
