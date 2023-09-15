@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ddziaduch\PenaltyPoints\Tests\Application;
 
 use ddziaduch\PenaltyPoints\Adapters\Secondary\FixedClock;
-use ddziaduch\PenaltyPoints\Application\Ports\Secondary\GetDriverFile;
+use ddziaduch\PenaltyPoints\Adapters\Secondary\InMemoryDriverFiles;
 use ddziaduch\PenaltyPoints\Application\DriverService;
 use ddziaduch\PenaltyPoints\Domain\DriverFile;
 use PHPUnit\Framework\TestCase;
@@ -15,12 +15,13 @@ class DriverServiceTest extends TestCase
 {
     private \DateTimeImmutable $now;
     private DriverFile $driverFile;
+    private DriverService $service;
 
     public function testSumOfValidPenaltyPoints(): void
     {
         self::assertSame(
             $this->driverFile->sumOfValidPenaltyPoints($this->now),
-            $this->readDriverFileService()->sumOfValidPenaltyPoints('123456789'),
+            $this->service->sumOfValidPenaltyPoints($this->driverFile->licenseNumber),
         );
     }
 
@@ -28,7 +29,7 @@ class DriverServiceTest extends TestCase
     {
         self::assertSame(
             $this->driverFile->isDrivingLicenseValid($this->now),
-            $this->readDriverFileService()->isDrivingLicenseValid('123456789'),
+            $this->service->isDrivingLicenseValid($this->driverFile->licenseNumber),
         );
     }
 
@@ -46,15 +47,12 @@ class DriverServiceTest extends TestCase
             isPaid: false,
             numberOfPoints: 10,
         );
-    }
 
-    private function readDriverFileService(): DriverService
-    {
         $clock = new FixedClock($this->now);
 
-        $getDriverFilePort = self::createStub(GetDriverFile::class);
-        $getDriverFilePort->method('get')->willReturn($this->driverFile);
+        $getDriverFile = new InMemoryDriverFiles();
+        $getDriverFile->store($this->driverFile);
 
-        return new DriverService($clock, $getDriverFilePort);
+        $this->service = new DriverService($clock, $getDriverFile);
     }
 }

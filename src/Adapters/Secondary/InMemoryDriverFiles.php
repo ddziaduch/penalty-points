@@ -16,7 +16,6 @@ final class InMemoryDriverFiles implements GetDriverFile, StoreDriverFile
     public function get(string $drivingLicenceNumber): DriverFile
     {
         if (!array_key_exists($drivingLicenceNumber, $this->driverFiles)) {
-            // TODO: proper exception
             throw new \OutOfBoundsException('The driver file does not exist');
         }
 
