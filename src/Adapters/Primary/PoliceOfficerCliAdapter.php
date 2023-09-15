@@ -11,9 +11,8 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-// TODO: rename the adapter
 #[AsCommand(name: 'app:impose-penalty', description: 'Allows to impose a new penalty to the driver')]
-final class ImposePenaltyCliAdapter extends Command
+final class PoliceOfficerCliAdapter extends Command
 {
     public function __construct(
         private readonly PoliceOfficer $imposePenalty,
@@ -37,8 +36,6 @@ final class ImposePenaltyCliAdapter extends Command
 
             return self::INVALID;
         }
-
-        // TODO: validate the is paid and think about possible values
 
         $this->imposePenalty->imposePenalty(
             $input->getArgument('driverLicenseNumber'),

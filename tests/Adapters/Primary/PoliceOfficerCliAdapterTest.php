@@ -9,8 +9,8 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 
-/** @covers \ddziaduch\PenaltyPoints\Adapters\Primary\ImposePenaltyCliAdapter */
-final class ImposePenaltyCliAdapterTest extends KernelTestCase
+/** @covers \ddziaduch\PenaltyPoints\Adapters\Primary\PoliceOfficerCliAdapter */
+final class PoliceOfficerCliAdapterTest extends KernelTestCase
 {
     public function testExecution(): void
     {

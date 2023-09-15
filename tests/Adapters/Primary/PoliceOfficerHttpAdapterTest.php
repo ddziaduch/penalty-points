@@ -8,8 +8,8 @@ use ddziaduch\PenaltyPoints\Application\Ports\Primary\PoliceOfficer;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
-/** @covers \ddziaduch\PenaltyPoints\Adapters\Primary\ImposePenaltyHttpAdapter */
-final class ImposePenaltyHttpAdapterTest extends WebTestCase
+/** @covers \ddziaduch\PenaltyPoints\Adapters\Primary\PoliceOfficerHttpAdapter */
+final class PoliceOfficerHttpAdapterTest extends WebTestCase
 {
     private const DRIVER_LICENSE_NUMBER = '11111/22/3333';
     private const NUMBER_OF_POINTS = 10;

@@ -7,8 +7,7 @@ namespace ddziaduch\PenaltyPoints\Adapters\Primary;
 use ddziaduch\PenaltyPoints\Application\Ports\Primary\PoliceOfficer;
 use Symfony\Component\HttpFoundation\Response;
 
-// TODO: rename the adapter
-final readonly class ImposePenaltyHttpAdapter
+final readonly class PoliceOfficerHttpAdapter
 {
     public function __construct(
         private PoliceOfficer $imposePenalty,
