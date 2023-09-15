@@ -15,6 +15,7 @@ final class DriverFile
     ) {
     }
 
+    /** @throws \DomainException */
     public function imposePenalty(
         string $series,
         int $number,
@@ -35,6 +36,7 @@ final class DriverFile
         );
     }
 
+    /** @throws \OutOfBoundsException */
     public function payPenalty(
         string $series,
         int $number,
