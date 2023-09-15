@@ -4,20 +4,21 @@ declare(strict_types=1);
 
 namespace ddziaduch\PenaltyPoints\Adapters\Primary;
 
-use ddziaduch\PenaltyPoints\Application\Ports\Primary\ImposePenalty;
+use ddziaduch\PenaltyPoints\Application\Ports\Primary\PoliceOfficer;
 use Symfony\Component\HttpFoundation\Response;
 
+// TODO: rename the adapter
 final readonly class ImposePenaltyHttpAdapter
 {
     public function __construct(
-        private ImposePenalty $imposePenalty,
+        private PoliceOfficer $imposePenalty,
     ) {}
 
     public function __invoke(
         string $driverLicenseNumber,
         int $numberOfPoints,
     ): Response {
-        $this->imposePenalty->impose($driverLicenseNumber, $numberOfPoints);
+        $this->imposePenalty->imposePenalty($driverLicenseNumber, false, $numberOfPoints);
 
         return new Response(status: Response::HTTP_NO_CONTENT);
     }

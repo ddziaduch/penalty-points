@@ -8,7 +8,6 @@ use ddziaduch\PenaltyPoints\Adapters\Secondary\FixedClock;
 use ddziaduch\PenaltyPoints\Application\Ports\Secondary\GetDriverFile;
 use ddziaduch\PenaltyPoints\Application\ReadDriveFileService;
 use ddziaduch\PenaltyPoints\Domain\DriverFile;
-use ddziaduch\PenaltyPoints\Domain\Penalty;
 use PHPUnit\Framework\TestCase;
 
 /** @covers \ddziaduch\PenaltyPoints\Application\ReadDriveFileService */
@@ -40,7 +39,11 @@ class ReadDriveFileServiceTest extends TestCase
         $this->now = new \DateTimeImmutable();
 
         $this->driverFile = new DriverFile('12345', $this->now->modify('-24 months'));
-        $this->driverFile->imposePenalty(new Penalty($this->now->modify('-6 months'), 10));
+        $this->driverFile->imposePenalty(
+            now: $this->now->modify('-6 months'),
+            isPaid: false,
+            numberOfPoints: 10,
+        );
     }
 
     private function readDriverFileService(): ReadDriveFileService

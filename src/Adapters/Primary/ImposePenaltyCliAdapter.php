@@ -4,18 +4,19 @@ declare(strict_types=1);
 
 namespace ddziaduch\PenaltyPoints\Adapters\Primary;
 
-use ddziaduch\PenaltyPoints\Application\Ports\Primary\ImposePenalty;
+use ddziaduch\PenaltyPoints\Application\Ports\Primary\PoliceOfficer;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+// TODO: rename the adapter
 #[AsCommand(name: 'app:impose-penalty', description: 'Allows to impose a new penalty to the driver')]
 final class ImposePenaltyCliAdapter extends Command
 {
     public function __construct(
-        private readonly ImposePenalty $imposePenalty,
+        private readonly PoliceOfficer $imposePenalty,
     ) {
         parent::__construct();
     }
@@ -23,6 +24,7 @@ final class ImposePenaltyCliAdapter extends Command
     protected function configure(): void
     {
         $this->addArgument('driverLicenseNumber', InputArgument::REQUIRED, 'The license number of the driver');
+        $this->addArgument('isPaid', InputArgument::REQUIRED, 'Whether the penalty is already paid');
         $this->addArgument('numberOfPoints', InputArgument::REQUIRED, 'The number of points');
     }
 
@@ -36,8 +38,11 @@ final class ImposePenaltyCliAdapter extends Command
             return self::INVALID;
         }
 
-        $this->imposePenalty->impose(
+        // TODO: validate the is paid and think about possible values
+
+        $this->imposePenalty->imposePenalty(
             $input->getArgument('driverLicenseNumber'),
+            $input->getArgument('isPaid'),
             (int) $numberOfPoints,
         );
 

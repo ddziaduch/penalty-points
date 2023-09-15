@@ -4,15 +4,20 @@ declare(strict_types=1);
 
 namespace ddziaduch\PenaltyPoints\Domain;
 
-final readonly class Penalty
+final class Penalty
 {
     public function __construct(
-        public \DateTimeImmutable $createdAt,
-        public int $numberOfPoints,
+        public readonly \DateTimeImmutable $occurredAt,
+        public ?\DateTimeImmutable $payedAt,
+        public readonly int $numberOfPoints,
     ) {}
 
     public function isValid(\DateTimeImmutable $now): bool
     {
-        return $this->createdAt->diff($now)->y < 2;
+        if ($this->payedAt === null) {
+            return true;
+        }
+
+        return $this->payedAt->diff($now)->y < 2;
     }
 }

@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace ddziaduch\PenaltyPoints\Application\Ports\Primary;
 
-use ddziaduch\PenaltyPoints\Domain\Penalty;
-
-interface ImposePenalty
+interface PoliceOfficer
 {
-    public function impose(
+    public function imposePenalty(
         string $driverLicenseNumber,
+        bool $isPaid,
         int $numberOfPoints,
     ): void;
 }

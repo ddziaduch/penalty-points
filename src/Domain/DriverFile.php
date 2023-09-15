@@ -7,26 +7,38 @@ namespace ddziaduch\PenaltyPoints\Domain;
 final class DriverFile
 {
     /** @var Penalty[] */
-    private array $penalties;
-    /** @var object[] */
-    private array $events;
+    private array $penalties = [];
 
     public function __construct(
         public readonly string $licenseNumber,
         public readonly \DateTimeImmutable $examPassedAt,
-        Penalty ...$penalties,
     ) {
-        $this->penalties = $penalties;
     }
 
-    public function imposePenalty(Penalty $penalty): void
+    public function imposePenalty(\DateTimeImmutable $now, bool $isPaid, int $numberOfPoints): void
     {
-        $this->penalties[] = $penalty;
-        $this->events[] = new PenaltyImposed($this->licenseNumber, $penalty);
-
-        if (!$this->isDrivingLicenseValid($penalty->createdAt)) {
-            $this->events[] = new DrivingLicenseNoLongerValid($this->licenseNumber);
+        if (!$this->isDrivingLicenseValid($now)) {
+            throw new \DomainException('Can not impose penalty, drivers licence is not valid anymore!');
         }
+
+        $this->penalties[] = new Penalty(
+            occurredAt: $now,
+            payedAt: $isPaid ? $now : null,
+            numberOfPoints: $numberOfPoints,
+        );
+    }
+
+    public function payPenalty(\DateTimeImmutable $penaltyOccurredAt, \DateTimeImmutable $now): void
+    {
+        foreach ($this->penalties as $penalty) {
+            if ($penalty->occurredAt === $penaltyOccurredAt) {
+                $penalty->payedAt = $now;
+
+                return;
+            }
+        }
+
+        throw new \OutOfBoundsException('Penalty now found');
     }
 
     public function isDrivingLicenseValid(\DateTimeImmutable $now): bool
@@ -54,14 +66,5 @@ final class DriverFile
         }
 
         return 20;
-    }
-
-    /** @return object[] */
-    public function dumpEvents(): array
-    {
-        $events = $this->events;
-        $this->events = [];
-
-        return $events;
     }
 }

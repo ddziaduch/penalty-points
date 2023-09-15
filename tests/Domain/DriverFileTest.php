@@ -5,15 +5,9 @@ declare(strict_types=1);
 namespace ddziaduch\PenaltyPoints\Tests\Domain;
 
 use ddziaduch\PenaltyPoints\Domain\DriverFile;
-use ddziaduch\PenaltyPoints\Domain\DrivingLicenseNoLongerValid;
-use ddziaduch\PenaltyPoints\Domain\Penalty;
-use ddziaduch\PenaltyPoints\Domain\PenaltyImposed;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \ddziaduch\PenaltyPoints\Domain\DriverFile
- * @covers \ddziaduch\PenaltyPoints\Domain\Penalty
- */
+/** @covers \ddziaduch\PenaltyPoints\Domain\DriverFile */
 final class DriverFileTest extends TestCase
 {
     /** @dataProvider provideDataForMaxNumberOfPenaltyPoints */
@@ -29,7 +23,7 @@ final class DriverFileTest extends TestCase
         );
     }
 
-    public static function provideDataForMaxNumberOfPenaltyPoints(): iterable
+    public static function provideDataForMaxNumberOfPenaltyPoints(): \Generator
     {
         $examPassedAt = new \DateTimeImmutable('2000-01-01T12:00:00Z');
 
@@ -55,131 +49,149 @@ final class DriverFileTest extends TestCase
     /**
      * @dataProvider isDrivingLicenseValidDataProvider
      *
-     * @param Penalty[] $previousPenalties
+     * @param array{ occurredAt: \DateTimeImmutable, isPaid: bool, numberOfPoints: int } $previousPenalties
      */
     public function testIsDrivingLicenseValid(
         \DateTimeImmutable $examPassedAt,
         array $previousPenalties,
-        Penalty $newPenalty,
-        bool $expectedReturnValue,
-    ): void {
-        $driverFile = new DriverFile('12345', $examPassedAt, ...$previousPenalties);
-        $driverFile->imposePenalty($newPenalty);
+        \DateTimeImmutable $now,
+        bool $isDrivingLicenseValid,
+    ): void
+    {
+        $driverFile = new DriverFile('12345', $examPassedAt);
+        foreach ($previousPenalties as $previousPenalty) {
+            $driverFile->imposePenalty(
+                now: $previousPenalty['occurredAt'],
+                isPaid: $previousPenalty['isPaid'],
+                numberOfPoints: $previousPenalty['numberOfPoints'],
+            );
+        }
         self::assertSame(
-            $expectedReturnValue,
-            $driverFile->isDrivingLicenseValid($newPenalty->createdAt),
+            $isDrivingLicenseValid,
+            $driverFile->isDrivingLicenseValid($now),
         );
     }
 
-    public static function isDrivingLicenseValidDataProvider(): iterable
+    public static function isDrivingLicenseValidDataProvider(): \Generator
     {
         $examPassedAt = new \DateTimeImmutable('2020-05-29T04:30:00Z');
 
         // exam passed less than year ago cases
-        yield 'exam passed less than year ago, got already 19 penalty points, just got new 2 penalty points' => [
+        yield 'exam passed less than year ago, got already 19 valid penalty points' => [
             'examPassedAt' => $examPassedAt,
             'previousPenalties' => [
-                new Penalty($examPassedAt->modify('+1 month'), 10),
-                new Penalty($examPassedAt->modify('+3 month'), 6),
-                new Penalty($examPassedAt->modify('+6 month'), 3),
+                [
+                    'occurredAt' => $examPassedAt->modify('+1 month'),
+                    'isPaid' => true,
+                    'numberOfPoints' => 10,
+                ],
+                [
+                    'occurredAt' => $examPassedAt->modify('+3 month'),
+                    'isPaid' => true,
+                    'numberOfPoints' => 6,
+                ],
+                [
+                    'occurredAt' => $examPassedAt->modify('+6 month'),
+                    'isPaid' => true,
+                    'numberOfPoints' => 3,
+                ],
             ],
-            'newPenalty' => new Penalty($examPassedAt->modify('+11 months'), 2),
-            'expectedReturnValue' => false,
+            'now' => $examPassedAt->modify('+11 months'),
+            'isDrivingLicenseValid' => false,
         ];
 
-        yield 'exam passed less than year ago, got already 18 penalty points, just got new 2 penalty points' => [
+        yield 'exam passed less than year ago, got already 18 valid penalty points' => [
             'examPassedAt' => $examPassedAt,
             'previousPenalties' => [
-                new Penalty($examPassedAt->modify('+1 month'), 10),
-                new Penalty($examPassedAt->modify('+3 month'), 6),
-                new Penalty($examPassedAt->modify('+6 month'), 2),
+                [
+                    'occurredAt' => $examPassedAt->modify('+1 month'),
+                    'isPaid' => true,
+                    'numberOfPoints' => 10,
+                ],
+                [
+                    'occurredAt' => $examPassedAt->modify('+3 month'),
+                    'isPaid' => true,
+                    'numberOfPoints' => 6,
+                ],
+                [
+                    'occurredAt' => $examPassedAt->modify('+6 month'),
+                    'isPaid' => false,
+                    'numberOfPoints' => 2,
+                ],
             ],
-            'newPenalty' => new Penalty($examPassedAt->modify('+11 months'), 2),
-            'expectedReturnValue' => true,
+            'now' => $examPassedAt->modify('+11 months'),
+            'isDrivingLicenseValid' => true,
         ];
 
         // exam passed more than year ago cases
-        yield 'exam passed more than year ago, got already 19 penalty points, just got new 2 penalty points' => [
+        yield 'exam passed more than year ago, got already 19 valid penalty points' => [
             'examPassedAt' => $examPassedAt,
             'previousPenalties' => [
-                new Penalty($examPassedAt->modify('+1 month'), 10),
-                new Penalty($examPassedAt->modify('+3 month'), 9),
+                [
+                    'occurredAt' => $examPassedAt->modify('+1 month'),
+                    'isPaid' => true,
+                    'numberOfPoints' => 10,
+                ],
+                [
+                    'occurredAt' => $examPassedAt->modify('+3 month'),
+                    'isPaid' => false,
+                    'numberOfPoints' => 9,
+                ],
             ],
-            'newPenalty' => new Penalty($examPassedAt->modify('+15 months'), 2),
-            'expectedReturnValue' => true,
+            'now' => $examPassedAt->modify('+15 months'),
+            'isDrivingLicenseValid' => true,
         ];
 
-        yield 'exam passed less than year ago, got already 18 penalty points, just got new 6 penalty points' => [
+        yield 'exam passed less than year ago, got already 18 valid penalty points' => [
             'examPassedAt' => $examPassedAt,
             'previousPenalties' => [
-                new Penalty($examPassedAt->modify('+1 month'), 10),
-                new Penalty($examPassedAt->modify('+3 month'), 3),
-                new Penalty($examPassedAt->modify('+4 month'), 3),
-                new Penalty($examPassedAt->modify('+6 month'), 2),
+                [
+                    'occurredAt' => $examPassedAt->modify('+1 month'),
+                    'isPaid' => true,
+                    'numberOfPoints' => 10,
+                ],
+                [
+                    'occurredAt' => $examPassedAt->modify('+3 month'),
+                    'isPaid' => true,
+                    'numberOfPoints' => 3,
+                ],
+                [
+                    'occurredAt' => $examPassedAt->modify('+4 month'),
+                    'isPaid' => true,
+                    'numberOfPoints' => 3,
+                ],
+                [
+                    'occurredAt' => $examPassedAt->modify('+6 month'),
+                    'isPaid' => true,
+                    'numberOfPoints' => 2,
+                ],
             ],
-            'newPenalty' => new Penalty($examPassedAt->modify('+18 months'), 6),
-            'expectedReturnValue' => true,
-        ];
-
-        yield 'exam passed less than year ago, got already 18 penalty points, just got new 10 penalty points' => [
-            'examPassedAt' => $examPassedAt,
-            'previousPenalties' => [
-                new Penalty($examPassedAt->modify('+1 month'), 10),
-                new Penalty($examPassedAt->modify('+3 month'), 3),
-                new Penalty($examPassedAt->modify('+4 month'), 3),
-                new Penalty($examPassedAt->modify('+6 month'), 2),
-            ],
-            'newPenalty' => new Penalty($examPassedAt->modify('+18 months'), 10),
-            'expectedReturnValue' => false,
+            'now' => $examPassedAt->modify('+18 months'),
+            'isDrivingLicenseValid' => false,
         ];
 
         // expired penalties cases
-        yield 'exam passed more than year ago, got already 18 penalty points, where 6 are expired, just got new 10 penalty points' => [
+        yield 'exam passed more than year ago, got already 18 valid penalty points, where 6 are expired' => [
             'examPassedAt' => $examPassedAt,
             'previousPenalties' => [
-                new Penalty($examPassedAt->modify('+1 month'), 6),
-                new Penalty($examPassedAt->modify('+13 month'), 10),
-                new Penalty($examPassedAt->modify('+26 month'), 2),
+                [
+                    'occurredAt' => $examPassedAt->modify('+1 month'),
+                    'isPaid' => true,
+                    'numberOfPoints' => 6,
+                ],
+                [
+                    'occurredAt' => $examPassedAt->modify('+13 month'),
+                    'isPaid' => true,
+                    'numberOfPoints' => 10,
+                ],
+                [
+                    'occurredAt' => $examPassedAt->modify('+26 month'),
+                    'isPaid' => true,
+                    'numberOfPoints' => 2,
+                ],
             ],
-            'newPenalty' => new Penalty($examPassedAt->modify('+36 months'), 10),
-            'expectedReturnValue' => true,
+            'now' => $examPassedAt->modify('+36 months'),
+            'isDrivingLicenseValid' => true,
         ];
-
-        yield 'exam passed more than year ago, got already 24 penalty points, where 2 are expired, just got new 10 penalty points' => [
-            'examPassedAt' => $examPassedAt,
-            'previousPenalties' => [
-                new Penalty($examPassedAt->modify('+1 month'), 2),
-                new Penalty($examPassedAt->modify('+13 month'), 10),
-                new Penalty($examPassedAt->modify('+16 month'), 10),
-                new Penalty($examPassedAt->modify('+26 month'), 2),
-            ],
-            'newPenalty' => new Penalty($examPassedAt->modify('+36 months'), 10),
-            'expectedReturnValue' => false,
-        ];
-    }
-
-    public function testImposePenaltyWhileNotExceedingPointsLimit(): void
-    {
-        $now = new \DateTimeImmutable();
-        $driverFile = new DriverFile('12345', $now->modify('-36 months'));
-        $driverFile->imposePenalty(new Penalty($now, 10));
-        $events = $driverFile->dumpEvents();
-        self::assertCount(1, $events);
-        self::assertInstanceOf(PenaltyImposed::class, $events[0] ?? null);
-    }
-
-    public function testImposePenaltyWhileExceedingPointsLimit(): void
-    {
-        $now = new \DateTimeImmutable();
-        $driverFile = new DriverFile('12345', $now->modify('-36 months'));
-        $driverFile->imposePenalty(new Penalty($now->modify('-10 months'), 10));
-        $driverFile->imposePenalty(new Penalty($now->modify('-6 months'), 10));
-        $driverFile->imposePenalty(new Penalty($now->modify('-3 months'), 10));
-        $events = $driverFile->dumpEvents();
-        self::assertCount(4, $events);
-        self::assertInstanceOf(PenaltyImposed::class, $events[0] ?? null);
-        self::assertInstanceOf(PenaltyImposed::class, $events[1] ?? null);
-        self::assertInstanceOf(PenaltyImposed::class, $events[2] ?? null);
-        self::assertInstanceOf(DrivingLicenseNoLongerValid::class, $events[3] ?? null);
     }
 }
