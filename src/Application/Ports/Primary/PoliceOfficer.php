@@ -7,22 +7,17 @@ namespace ddziaduch\PenaltyPoints\Application\Ports\Primary;
 interface PoliceOfficer
 {
     /**
+     * @param bool $isPaidOnSpot
      * @param int $number *
      * @param string $series
      *
 * @throws \DomainException
      */
-    public function imposeUnpaidPenalty(
+    public function imposePenalty(
         string $driverLicenseNumber,
         string $penaltySeries,
         int $penaltyNumber,
         int $numberOfPenaltyPoints,
-    ): void;
-
-    public function imposePenaltyPaidOnSpot(
-        string $driverLicenseNumber,
-        int $penaltyNumber,
-        string $penaltySeries,
-        int $numberOfPenaltyPoints
+        bool $isPaidOnSpot,
     ): void;
 }

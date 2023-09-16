@@ -12,7 +12,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(name: 'police-officer:impose-unpaid-penalty', description: 'Allows to impose a new penalty to the driver')]
-final class PoliceOfficerImposeUnpaidPenaltyCliAdapter extends Command
+final class PoliceOfficerImposePenaltyCliAdapter extends Command
 {
     public function __construct(
         private readonly PoliceOfficer $policeOfficer,
@@ -25,6 +25,7 @@ final class PoliceOfficerImposeUnpaidPenaltyCliAdapter extends Command
         $this->addArgument('driverLicenseNumber', InputArgument::REQUIRED, 'The license number of the driver');
         $this->addArgument('penaltySeries', InputArgument::REQUIRED, 'The series of the penalty');
         $this->addArgument('penaltyNumber', InputArgument::REQUIRED, 'The number of the penalty');
+        $this->addArgument('isPaidOnSpot', InputArgument::REQUIRED, 'Whether the penalty is paid on spot');
         $this->addArgument('numberOfPenaltyPoints', InputArgument::REQUIRED, 'The number of penalty points');
     }
 
@@ -45,11 +46,12 @@ final class PoliceOfficerImposeUnpaidPenaltyCliAdapter extends Command
             return self::INVALID;
         }
 
-        $this->policeOfficer->imposeUnpaidPenalty(
+        $this->policeOfficer->imposePenalty(
             $input->getArgument('driverLicenseNumber'),
             $input->getArgument('penaltySeries'),
-            $penaltyNumber,
-            (int)$numberOfPoints,
+            (int) $penaltyNumber,
+            (int) $numberOfPoints,
+            (bool) $input->getArgument('isPaidOnSpot'),
         );
 
         return self::SUCCESS;

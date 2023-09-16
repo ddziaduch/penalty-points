@@ -16,24 +16,17 @@ final class DriverFile
     }
 
     /** @throws \DomainException */
-    public function imposePenaltyPaidOnSpot(
+    public function imposePenalty(
         string $series,
         int $number,
         \DateTimeImmutable $occurredAt,
-        int $numberOfPoints
+        int $numberOfPoints,
+        bool $isPaidOnSpot,
     ): void {
-        $penalty = Penalty::paidOnSpot($series, $number, $occurredAt, $numberOfPoints);
-        $this->imposePenaltyInternal($occurredAt, $penalty);
-    }
+        $penalty = $isPaidOnSpot
+            ? Penalty::paidOnSpot($series, $number, $occurredAt, $numberOfPoints)
+            : Penalty::unpaid($series, $number, $occurredAt, $numberOfPoints);
 
-    /** @throws \DomainException */
-    public function imposeUnpaidPenalty(
-        string $series,
-        int $number,
-        \DateTimeImmutable $occurredAt,
-        int $numberOfPoints
-    ): void {
-        $penalty = Penalty::unpaid($series, $number, $occurredAt, $numberOfPoints);
         $this->imposePenaltyInternal($occurredAt, $penalty);
     }
 

@@ -47,9 +47,9 @@ final class ImposePenaltyServiceIntegrationTest extends KernelTestCase
         $driverFiles->store($driverFile);
 
         $service = $this->getService();
-        $service->imposeUnpaidPenalty($driverFile->licenseNumber, 'CS', 12345, 10);
-        $service->imposeUnpaidPenalty($driverFile->licenseNumber, 'CS', 12345, 10);
-        $service->imposeUnpaidPenalty($driverFile->licenseNumber, 'CS', 12345, 10);
+        $service->imposePenalty($driverFile->licenseNumber, 'CS', 12345, 10, false);
+        $service->imposePenalty($driverFile->licenseNumber, 'CS', 12345, 10, false);
+        $service->imposePenalty($driverFile->licenseNumber, 'CS', 12345, 10, false);
 
         self::assertCount(4, $eventSubscriber->events);
         self::assertFalse($driverFile->isDrivingLicenseValid($now));
