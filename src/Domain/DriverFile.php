@@ -16,36 +16,44 @@ final class DriverFile
     }
 
     /** @throws \DomainException */
-    public function imposePenalty(
+    public function imposePaidPenalty(
         string $series,
         int $number,
         \DateTimeImmutable $occurredAt,
-        bool $isPaid,
         int $numberOfPoints
     ): void {
-        // TODO: split into two methods, paid and unpaid
-        if (!$this->isDrivingLicenseValid($occurredAt)) {
-            throw new \DomainException('Can not impose penalty, drivers licence is not valid anymore!');
-        }
-
-        $this->penalties[] = new Penalty(
-            series: $series,
-            number: $number,
-            occurredAt: $occurredAt,
-            payedAt: $isPaid ? $occurredAt : null,
-            numberOfPoints: $numberOfPoints,
-        );
+        $penalty = Penalty::paid($series, $number, $occurredAt, $numberOfPoints);
+        $this->imposePenaltyInternal($occurredAt, $penalty);
     }
 
-    /** @throws \OutOfBoundsException */
+    /** @throws \DomainException */
+    public function imposeUnpaidPenalty(
+        string $series,
+        int $number,
+        \DateTimeImmutable $occurredAt,
+        int $numberOfPoints
+    ): void {
+        $penalty = Penalty::unpaid($series, $number, $occurredAt, $numberOfPoints);
+        $this->imposePenaltyInternal($occurredAt, $penalty);
+    }
+
+
+    /**
+     * @throws \OutOfBoundsException
+     * @throws \DomainException
+     */
     public function payPenalty(
         string $series,
         int $number,
-        \DateTimeImmutable $now,
+        \DateTimeImmutable $payedAt,
     ): void {
-        foreach ($this->penalties as $penalty) {
+        foreach ($this->penalties as $key => $penalty) {
             if ($penalty->series === $series && $penalty->number === $number) {
-                $penalty->payedAt = $now;
+                if ($penalty->isPaid()) {
+                    throw new \DomainException('Penalty already paid');
+                }
+
+                $this->penalties[$key] = $penalty->pay($payedAt);
 
                 return;
             }
@@ -79,5 +87,13 @@ final class DriverFile
         }
 
         return 20;
+    }
+
+    private function imposePenaltyInternal(\DateTimeImmutable $occurredAt, Penalty $penalty): void
+    {
+        if (!$this->isDrivingLicenseValid($occurredAt)) {
+            throw new \DomainException('Can not impose penalty, drivers licence is not valid anymore');
+        }
+        $this->penalties[] = $penalty;
     }
 }

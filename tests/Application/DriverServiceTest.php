@@ -40,11 +40,10 @@ class DriverServiceTest extends TestCase
         $this->now = new \DateTimeImmutable();
 
         $this->driverFile = new DriverFile('12345', $this->now->modify('-24 months'));
-        $this->driverFile->imposePenalty(
+        $this->driverFile->imposeUnpaidPenalty(
             'CS',
             12345,
             occurredAt: $this->now->modify('-6 months'),
-            isPaid: false,
             numberOfPoints: 10,
         );
 

@@ -10,13 +10,16 @@ use PHPUnit\Framework\TestCase;
 /** @covers \ddziaduch\PenaltyPoints\Domain\DriverFile */
 final class DriverFileTest extends TestCase
 {
+    private const LICENSE_NUMBER = '12345';
+    private const PENALTY_SERIES = 'CS';
+
     /** @dataProvider provideDataForMaxNumberOfPenaltyPoints */
     public function testMaxNumberOfPenaltyPoints(
         \DateTimeImmutable $examPassedAt,
         \DateTimeImmutable $now,
         int $expectedNumberOfPenaltyPoints,
     ): void {
-        $driver = new DriverFile('12345', $examPassedAt);
+        $driver = new DriverFile(self::LICENSE_NUMBER, $examPassedAt);
         self::assertSame(
             $expectedNumberOfPenaltyPoints,
             $driver->maxNumberOfPenaltyPoints($now),
@@ -57,15 +60,23 @@ final class DriverFileTest extends TestCase
         \DateTimeImmutable $now,
         bool $isDrivingLicenseValid,
     ): void {
-        $driverFile = new DriverFile('12345', $examPassedAt);
+        $driverFile = new DriverFile(self::LICENSE_NUMBER, $examPassedAt);
         foreach ($previousPenalties as $number => $previousPenalty) {
-            $driverFile->imposePenalty(
-                'CS',
-                $number,
-                occurredAt: $previousPenalty['occurredAt'],
-                isPaid: $previousPenalty['isPaid'],
-                numberOfPoints: $previousPenalty['numberOfPoints'],
-            );
+            if ($previousPenalty['isPaid']) {
+                $driverFile->imposePaidPenalty(
+                    self::PENALTY_SERIES,
+                    $number,
+                    occurredAt: $previousPenalty['occurredAt'],
+                    numberOfPoints: $previousPenalty['numberOfPoints'],
+                );
+            } else {
+                $driverFile->imposeUnpaidPenalty(
+                    self::PENALTY_SERIES,
+                    $number,
+                    occurredAt: $previousPenalty['occurredAt'],
+                    numberOfPoints: $previousPenalty['numberOfPoints'],
+                );
+            }
         }
         self::assertSame(
             $isDrivingLicenseValid,
@@ -143,7 +154,7 @@ final class DriverFileTest extends TestCase
             'isDrivingLicenseValid' => true,
         ];
 
-        yield 'exam passed less than year ago, got already 18 valid penalty points' => [
+        yield 'exam passed more than year ago, got already 18 valid penalty points' => [
             'examPassedAt' => $examPassedAt,
             'previousPenalties' => [
                 [
@@ -200,28 +211,25 @@ final class DriverFileTest extends TestCase
     {
         $now = new \DateTimeImmutable();
 
-        $driverFile = new DriverFile('12345', $now->modify('-8 months'));
-        $driverFile->imposePenalty(
-            series: 'CS',
+        $driverFile = new DriverFile(self::LICENSE_NUMBER, $now->modify('-8 months'));
+        $driverFile->imposePaidPenalty(
+            series: self::PENALTY_SERIES,
             number: 1,
             occurredAt: $now->modify('-6 months'),
-            isPaid: true,
             numberOfPoints: 12,
         );
-        $driverFile->imposePenalty(
-            series: 'CS',
+        $driverFile->imposePaidPenalty(
+            series: self::PENALTY_SERIES,
             number: 2,
             occurredAt: $now->modify('-3 months'),
-            isPaid: true,
             numberOfPoints: 12,
         );
 
         $this->expectException(\DomainException::class);
-        $driverFile->imposePenalty(
-            series: 'CS',
+        $driverFile->imposeUnpaidPenalty(
+            series: self::PENALTY_SERIES,
             number: 3,
             occurredAt: $now,
-            isPaid: false,
             numberOfPoints: 12,
         );
     }
@@ -230,24 +238,40 @@ final class DriverFileTest extends TestCase
     {
         $this->expectNotToPerformAssertions();
         $now = new \DateTimeImmutable();
-        $driverFile = new DriverFile('12345', $now->modify('-36 months'));
+        $driverFile = new DriverFile(self::LICENSE_NUMBER, $now->modify('-36 months'));
         $penaltyOccurredAt = $now->modify('-6 months');
-        $driverFile->imposePenalty(
-            series: 'CS',
+        $driverFile->imposeUnpaidPenalty(
+            series: self::PENALTY_SERIES,
             number: 1,
             occurredAt: $penaltyOccurredAt,
-            isPaid: false,
             numberOfPoints: 12,
         );
-        $driverFile->payPenalty(series: 'CS', number: 1, now: $now->modify('-5 months'),
-        );
+        $driverFile->payPenalty(series: self::PENALTY_SERIES, number: 1, payedAt: $now->modify('-5 months'));
     }
 
     public function testPayingUnknownPenalty(): void
     {
         $now = new \DateTimeImmutable();
-        $driverFile = new DriverFile('12345', $now->modify('-36 months'));
+        $driverFile = new DriverFile(self::LICENSE_NUMBER, $now->modify('-36 months'));
         $this->expectException(\OutOfBoundsException::class);
-        $driverFile->payPenalty(series: 'CS', number: 12345, now: $now->modify('-5 months'));
+        $driverFile->payPenalty(series: self::PENALTY_SERIES, number: 12345, payedAt: $now->modify('-5 months'));
+    }
+
+    public function testPayingAlreadyPaidPenalty(): void
+    {
+        $now = new \DateTimeImmutable();
+        $driverFile = new DriverFile(self::LICENSE_NUMBER, $now->modify('-36 months'));
+        $this->expectException(\OutOfBoundsException::class);
+        $penaltyOccurredAt = $now->modify('-6 months');
+        $driverFile->imposeUnpaidPenalty(
+            series: self::PENALTY_SERIES,
+            number: 1,
+            occurredAt: $penaltyOccurredAt,
+            numberOfPoints: 12,
+        );
+        $driverFile->payPenalty(series: self::PENALTY_SERIES, number: 1, payedAt: $now->modify('-5 months'));
+
+        $this->expectException(\DomainException::class);
+        $driverFile->payPenalty(series: self::PENALTY_SERIES, number: 1, payedAt: $now->modify('-5 months'));
     }
 }
