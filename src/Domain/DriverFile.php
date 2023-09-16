@@ -23,11 +23,15 @@ final class DriverFile
         int $numberOfPoints,
         bool $isPaidOnSpot,
     ): void {
+        if (!$this->isDrivingLicenseValid($occurredAt)) {
+            throw new \DomainException('Can not impose penalty, licence is not valid anymore');
+        }
+
         $penalty = $isPaidOnSpot
             ? Penalty::paidOnSpot($series, $number, $occurredAt, $numberOfPoints)
             : Penalty::unpaid($series, $number, $occurredAt, $numberOfPoints);
 
-        $this->imposePenaltyInternal($occurredAt, $penalty);
+        $this->penalties[] = $penalty;
     }
 
 
@@ -82,12 +86,4 @@ final class DriverFile
         return 20;
     }
 
-    private function imposePenaltyInternal(\DateTimeImmutable $occurredAt, Penalty $penalty): void
-    {
-        if (!$this->isDrivingLicenseValid($occurredAt)) {
-            throw new \DomainException('Can not impose penalty, drivers licence is not valid anymore');
-        }
-
-        $this->penalties[] = $penalty;
-    }
 }
