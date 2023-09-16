@@ -17,29 +17,40 @@ final readonly class PoliceOfficerService implements PoliceOfficer
         private StoreDriverFile $storeDriverFile,
     ) {}
 
-    public function imposePenalty(
+    public function imposeUnpaidPenalty(
         string $driverLicenseNumber,
-        bool $isPaid,
-        int $numberOfPoints,
+        string $penaltySeries,
+        int $penaltyNumber,
+        int $numberOfPenaltyPoints,
     ): void {
         $now = $this->clock->now();
         $driverFile = $this->getDriverFile->get($driverLicenseNumber);
 
-        if ($isPaid) {
-            $driverFile->imposePaidPenalty(
-                series: 'CS',
-                number: 12345,
-                occurredAt: $now,
-                numberOfPoints: $numberOfPoints,
-            );
-        } else {
-            $driverFile->imposeUnpaidPenalty(
-                series: 'CS',
-                number: 12345,
-                occurredAt: $now,
-                numberOfPoints: $numberOfPoints,
-            );
-        }
+        $driverFile->imposeUnpaidPenalty(
+            series: $penaltySeries,
+            number: $penaltyNumber,
+            occurredAt: $now,
+            numberOfPoints: $numberOfPenaltyPoints,
+        );
+
+        $this->storeDriverFile->store($driverFile);
+    }
+
+    public function imposePenaltyPaidOnSpot(
+        string $driverLicenseNumber,
+        int $penaltyNumber,
+        string $penaltySeries,
+        int $numberOfPenaltyPoints,
+    ): void {
+        $now = $this->clock->now();
+        $driverFile = $this->getDriverFile->get($driverLicenseNumber);
+
+        $driverFile->imposePenaltyPaidOnSpot(
+            series: $penaltySeries,
+            number: $penaltyNumber,
+            occurredAt: $now,
+            numberOfPoints: $numberOfPenaltyPoints,
+        );
 
         $this->storeDriverFile->store($driverFile);
     }

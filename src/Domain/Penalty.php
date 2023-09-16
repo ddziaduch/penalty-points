@@ -23,7 +23,7 @@ final readonly class Penalty
         return new self($series, $number, $occurredAt, null, $numberOfPoints);
     }
 
-    public static function paid(
+    public static function paidOnSpot(
         string $series,
         int $number,
         \DateTimeImmutable $occurredAt,

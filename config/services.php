@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use ddziaduch\PenaltyPoints\Adapters\Primary\PoliceOfficerImposePenaltyCliAdapter;
+use ddziaduch\PenaltyPoints\Adapters\Primary\PoliceOfficerImposeUnpaidPenaltyCliAdapter;
 use ddziaduch\PenaltyPoints\Adapters\Primary\PoliceOfficerImposePenaltyHttpAdapter;
 use ddziaduch\PenaltyPoints\Adapters\Secondary\SystemClock;
 use ddziaduch\PenaltyPoints\Adapters\Secondary\InMemoryDriverFiles;
@@ -31,7 +31,7 @@ return static function (ContainerConfigurator $configurator): void {
         service(PoliceOfficer::class),
     ])->tag('controller.service_arguments');
 
-    $services->set(PoliceOfficerImposePenaltyCliAdapter::class)->args([
+    $services->set(PoliceOfficerImposeUnpaidPenaltyCliAdapter::class)->args([
         service(PoliceOfficer::class),
     ])->tag('console.command');
 };

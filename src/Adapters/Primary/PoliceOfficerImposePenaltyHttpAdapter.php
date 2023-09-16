@@ -17,7 +17,7 @@ final readonly class PoliceOfficerImposePenaltyHttpAdapter
         string $driverLicenseNumber,
         int $numberOfPoints,
     ): Response {
-        $this->policeOfficer->imposePenalty($driverLicenseNumber, false, $numberOfPoints);
+        $this->policeOfficer->imposeUnpaidPenalty($driverLicenseNumber, 'CS', 12345, $numberOfPoints);
 
         return new Response(status: Response::HTTP_NO_CONTENT);
     }

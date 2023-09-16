@@ -19,7 +19,7 @@ final class PoliceOfficerHttpAdapterTest extends WebTestCase
         $this->markTestIncomplete('fix me');
 
         $imposePenalty = $this->createMock(PoliceOfficer::class);
-        $imposePenalty->expects(self::once())->method('imposePenalty')->with(
+        $imposePenalty->expects(self::once())->method('imposeUnpaidPenalty')->with(
             self::DRIVER_LICENSE_NUMBER,
             self::NUMBER_OF_POINTS,
         );

@@ -21,28 +21,45 @@ class PenaltyTest extends TestCase
         $now = new \DateTimeImmutable();
 
         yield 'unpaid' => [
-            'penalty' => Penalty::unpaid('CS', 12345, occurredAt: $now, numberOfPoints: 10),
+            'penalty' => Penalty::unpaid(
+                series: 'CS',
+                number: 12345,
+                occurredAt: $now,
+                numberOfPoints: 10
+            ),
             'isValid' => true,
             'now' => $now,
         ];
 
-        yield 'paid, less than 2 years ago' => [
-            'penalty' => Penalty::paid('CS', 12345, occurredAt: $now->modify('-1 years'), numberOfPoints: 10),
+        yield 'paid on spot, occurred less than 2 years ago' => [
+            'penalty' => Penalty::paidOnSpot(
+                series: 'CS',
+                number: 12345,
+                occurredAt: $now->modify('-1 years'),
+                numberOfPoints: 10,
+            ),
             'isValid' => true,
             'now' => $now,
         ];
 
-        yield 'paid, 2 years ago' => [
-            'penalty' => Penalty::paid('CS', 12345, occurredAt: $now->modify('-2 years'), numberOfPoints: 10),
+        yield 'paid on spot, occurred 2 years ago' => [
+            'penalty' => Penalty::paidOnSpot(
+                series: 'CS',
+                number: 12345,
+                occurredAt: $now->modify('-2 years'),
+                numberOfPoints: 10,
+            ),
             'isValid' => false,
             'now' => $now,
         ];
 
-        yield 'paid, more than 2 years ago' => [
-            'penalty' => Penalty::paid('CS',
-                12345,
+        yield 'paid on spot, occurred more than 2 years ago' => [
+            'penalty' => Penalty::paidOnSpot(
+                series: 'CS',
+                number: 12345,
                 occurredAt: $now->modify('-3 years'),
-                numberOfPoints: 10),
+                numberOfPoints: 10,
+            ),
             'isValid' => false,
             'now' => $now,
         ];

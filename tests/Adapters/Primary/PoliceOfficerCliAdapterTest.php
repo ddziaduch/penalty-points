@@ -9,7 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 
-/** @covers \ddziaduch\PenaltyPoints\Adapters\Primary\PoliceOfficerImposePenaltyCliAdapter */
+/** @covers \ddziaduch\PenaltyPoints\Adapters\Primary\PoliceOfficerImposeUnpaidPenaltyCliAdapter */
 final class PoliceOfficerCliAdapterTest extends KernelTestCase
 {
     public function testExecution(): void
@@ -22,7 +22,7 @@ final class PoliceOfficerCliAdapterTest extends KernelTestCase
         $kernel = self::bootKernel();
 
         $imposePenalty = $this->createMock(PoliceOfficer::class);
-        $imposePenalty->expects(self::once())->method('imposePenalty')->with($driverLicenseNumber, (int) $penaltyPoints);
+        $imposePenalty->expects(self::once())->method('imposeUnpaidPenalty')->with($driverLicenseNumber, (int) $penaltyPoints);
 
         self::getContainer()->set(PoliceOfficer::class, $imposePenalty);
         $application = new Application($kernel);

@@ -52,7 +52,7 @@ final class DriverFileTest extends TestCase
     /**
      * @dataProvider isDrivingLicenseValidDataProvider
      *
-     * @param array{ occurredAt: \DateTimeImmutable, isPaid: bool, numberOfPoints: int } $previousPenalties
+     * @param array{ occurredAt: \DateTimeImmutable, isPaidOnSpot: bool, numberOfPoints: int } $previousPenalties
      */
     public function testIsDrivingLicenseValid(
         \DateTimeImmutable $examPassedAt,
@@ -61,9 +61,10 @@ final class DriverFileTest extends TestCase
         bool $isDrivingLicenseValid,
     ): void {
         $driverFile = new DriverFile(self::LICENSE_NUMBER, $examPassedAt);
+
         foreach ($previousPenalties as $number => $previousPenalty) {
-            if ($previousPenalty['isPaid']) {
-                $driverFile->imposePaidPenalty(
+            if ($previousPenalty['isPaidOnSpot']) {
+                $driverFile->imposePenaltyPaidOnSpot(
                     self::PENALTY_SERIES,
                     $number,
                     occurredAt: $previousPenalty['occurredAt'],
@@ -78,6 +79,7 @@ final class DriverFileTest extends TestCase
                 );
             }
         }
+
         self::assertSame(
             $isDrivingLicenseValid,
             $driverFile->isDrivingLicenseValid($now),
@@ -89,22 +91,27 @@ final class DriverFileTest extends TestCase
         $examPassedAt = new \DateTimeImmutable('2020-05-29T04:30:00Z');
 
         // exam passed less than year ago cases
-        yield 'exam passed less than year ago, got already 19 valid penalty points' => [
+        yield 'exam passed less than year ago, got already 21 valid penalty points' => [
             'examPassedAt' => $examPassedAt,
             'previousPenalties' => [
                 [
                     'occurredAt' => $examPassedAt->modify('+1 month'),
-                    'isPaid' => true,
+                    'isPaidOnSpot' => true,
                     'numberOfPoints' => 10,
                 ],
                 [
                     'occurredAt' => $examPassedAt->modify('+3 month'),
-                    'isPaid' => true,
+                    'isPaidOnSpot' => true,
                     'numberOfPoints' => 6,
                 ],
                 [
                     'occurredAt' => $examPassedAt->modify('+6 month'),
-                    'isPaid' => true,
+                    'isPaidOnSpot' => true,
+                    'numberOfPoints' => 3,
+                ],
+                [
+                    'occurredAt' => $examPassedAt->modify('+3 month'),
+                    'isPaidOnSpot' => true,
                     'numberOfPoints' => 3,
                 ],
             ],
@@ -117,17 +124,17 @@ final class DriverFileTest extends TestCase
             'previousPenalties' => [
                 [
                     'occurredAt' => $examPassedAt->modify('+1 month'),
-                    'isPaid' => true,
+                    'isPaidOnSpot' => true,
                     'numberOfPoints' => 10,
                 ],
                 [
                     'occurredAt' => $examPassedAt->modify('+3 month'),
-                    'isPaid' => true,
+                    'isPaidOnSpot' => true,
                     'numberOfPoints' => 6,
                 ],
                 [
                     'occurredAt' => $examPassedAt->modify('+6 month'),
-                    'isPaid' => false,
+                    'isPaidOnSpot' => false,
                     'numberOfPoints' => 2,
                 ],
             ],
@@ -141,12 +148,12 @@ final class DriverFileTest extends TestCase
             'previousPenalties' => [
                 [
                     'occurredAt' => $examPassedAt->modify('+1 month'),
-                    'isPaid' => true,
+                    'isPaidOnSpot' => true,
                     'numberOfPoints' => 10,
                 ],
                 [
                     'occurredAt' => $examPassedAt->modify('+3 month'),
-                    'isPaid' => false,
+                    'isPaidOnSpot' => false,
                     'numberOfPoints' => 9,
                 ],
             ],
@@ -159,23 +166,28 @@ final class DriverFileTest extends TestCase
             'previousPenalties' => [
                 [
                     'occurredAt' => $examPassedAt->modify('+1 month'),
-                    'isPaid' => true,
+                    'isPaidOnSpot' => true,
                     'numberOfPoints' => 10,
                 ],
                 [
                     'occurredAt' => $examPassedAt->modify('+3 month'),
-                    'isPaid' => true,
+                    'isPaidOnSpot' => true,
                     'numberOfPoints' => 3,
                 ],
                 [
                     'occurredAt' => $examPassedAt->modify('+4 month'),
-                    'isPaid' => true,
+                    'isPaidOnSpot' => true,
                     'numberOfPoints' => 3,
                 ],
                 [
                     'occurredAt' => $examPassedAt->modify('+6 month'),
-                    'isPaid' => true,
+                    'isPaidOnSpot' => true,
                     'numberOfPoints' => 2,
+                ],
+                [
+                    'occurredAt' => $examPassedAt->modify('+3 month'),
+                    'isPaidOnSpot' => false,
+                    'numberOfPoints' => 8,
                 ],
             ],
             'now' => $examPassedAt->modify('+18 months'),
@@ -188,17 +200,17 @@ final class DriverFileTest extends TestCase
             'previousPenalties' => [
                 [
                     'occurredAt' => $examPassedAt->modify('+1 month'),
-                    'isPaid' => true,
+                    'isPaidOnSpot' => true,
                     'numberOfPoints' => 6,
                 ],
                 [
                     'occurredAt' => $examPassedAt->modify('+13 month'),
-                    'isPaid' => true,
+                    'isPaidOnSpot' => true,
                     'numberOfPoints' => 10,
                 ],
                 [
                     'occurredAt' => $examPassedAt->modify('+26 month'),
-                    'isPaid' => true,
+                    'isPaidOnSpot' => true,
                     'numberOfPoints' => 2,
                 ],
             ],
@@ -212,13 +224,13 @@ final class DriverFileTest extends TestCase
         $now = new \DateTimeImmutable();
 
         $driverFile = new DriverFile(self::LICENSE_NUMBER, $now->modify('-8 months'));
-        $driverFile->imposePaidPenalty(
+        $driverFile->imposePenaltyPaidOnSpot(
             series: self::PENALTY_SERIES,
             number: 1,
             occurredAt: $now->modify('-6 months'),
             numberOfPoints: 12,
         );
-        $driverFile->imposePaidPenalty(
+        $driverFile->imposePenaltyPaidOnSpot(
             series: self::PENALTY_SERIES,
             number: 2,
             occurredAt: $now->modify('-3 months'),
