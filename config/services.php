@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use ddziaduch\PenaltyPoints\Adapters\Primary\Http\PoliceOfficerImposePenaltyCliAdapter;
-use ddziaduch\PenaltyPoints\Adapters\Primary\PoliceOfficerImposePenaltyHttpAdapter;
+use ddziaduch\PenaltyPoints\Adapters\Primary\Cli\PoliceOfficerImposePenaltyCliAdapter;
+use ddziaduch\PenaltyPoints\Adapters\Primary\Http\PoliceOfficerImposePenaltyHttpAdapter;
 use ddziaduch\PenaltyPoints\Adapters\Secondary\SystemClock;
 use ddziaduch\PenaltyPoints\Adapters\Secondary\InMemoryDriverFiles;
 use ddziaduch\PenaltyPoints\Application\PoliceOfficerService;

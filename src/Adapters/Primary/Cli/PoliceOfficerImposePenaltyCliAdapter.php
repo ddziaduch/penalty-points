@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ddziaduch\PenaltyPoints\Adapters\Primary\Http;
+namespace ddziaduch\PenaltyPoints\Adapters\Primary\Cli;
 
 use ddziaduch\PenaltyPoints\Application\Ports\Primary\PoliceOfficer;
 use Symfony\Component\Console\Attribute\AsCommand;
