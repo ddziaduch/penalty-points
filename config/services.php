@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use ddziaduch\PenaltyPoints\Adapters\Primary\PoliceOfficerImposePenaltyCliAdapter;
+use ddziaduch\PenaltyPoints\Adapters\Primary\Http\PoliceOfficerImposePenaltyCliAdapter;
 use ddziaduch\PenaltyPoints\Adapters\Primary\PoliceOfficerImposePenaltyHttpAdapter;
 use ddziaduch\PenaltyPoints\Adapters\Secondary\SystemClock;
 use ddziaduch\PenaltyPoints\Adapters\Secondary\InMemoryDriverFiles;
@@ -23,7 +23,6 @@ return static function (ContainerConfigurator $configurator): void {
     $services->set(PoliceOfficer::class, PoliceOfficerService::class)->args([
         service(ClockInterface::class),
         service(InMemoryDriverFiles::class),
-        service('event_dispatcher'),
         service(InMemoryDriverFiles::class),
     ]);
 
