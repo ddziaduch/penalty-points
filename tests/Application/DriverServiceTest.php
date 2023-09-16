@@ -38,19 +38,11 @@ class DriverServiceTest extends TestCase
         parent::setUp();
 
         $this->now = new \DateTimeImmutable();
-
-        $this->driverFile = new DriverFile('12345', $this->now->modify('-24 months'));
-        $this->driverFile->imposePenalty(
-            'CS',
-            12345,
-            occurredAt: $this->now->modify('-6 months'),
-            numberOfPoints: 10,
-            isPaidOnSpot: true,
-        );
+        $this->driverFile = InMemoryDriverFiles::newbieDriverFile($this->now);
 
         $clock = new FixedClock($this->now);
 
-        $getDriverFile = new InMemoryDriverFiles();
+        $getDriverFile = new InMemoryDriverFiles($clock);
         $getDriverFile->store($this->driverFile);
 
         $this->service = new DriverService($clock, $getDriverFile);

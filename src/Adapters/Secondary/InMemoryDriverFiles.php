@@ -7,18 +7,17 @@ namespace ddziaduch\PenaltyPoints\Adapters\Secondary;
 use ddziaduch\PenaltyPoints\Application\Ports\Secondary\GetDriverFile;
 use ddziaduch\PenaltyPoints\Application\Ports\Secondary\StoreDriverFile;
 use ddziaduch\PenaltyPoints\Domain\DriverFile;
+use Psr\Clock\ClockInterface;
 
 final class InMemoryDriverFiles implements GetDriverFile, StoreDriverFile
 {
     /** @var array<string, DriverFile> */
     private array $driverFiles;
 
-    public function __construct()
+    public function __construct(ClockInterface $clock)
     {
-        $now = new \DateTimeImmutable();
-
-        $newbie = self::newbieDriverFile($now);
-        $pirate = self::pirateDriverFile($now);
+        $newbie = self::newbieDriverFile($clock->now());
+        $pirate = self::pirateDriverFile($clock->now());
 
         $this->driverFiles = [
             $newbie->licenseNumber => $newbie,
