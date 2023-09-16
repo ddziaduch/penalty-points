@@ -83,6 +83,7 @@ final class InMemoryDriverFiles implements GetDriverFile, StoreDriverFile
             numberOfPoints: 15,
             isPaidOnSpot: true,
         );
+
         return $pirate;
     }
 }

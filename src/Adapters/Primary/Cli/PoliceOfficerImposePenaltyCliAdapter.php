@@ -31,23 +31,37 @@ final class PoliceOfficerImposePenaltyCliAdapter extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $numberOfPoints = $input->getArgument('numberOfPenaltyPoints');
+        $driverLicenseNumber = $input->getArgument('driverLicenseNumber');
+        $penaltySeries = $input->getArgument('penaltySeries');
         $penaltyNumber = $input->getArgument('penaltyNumber');
+        $numberOfPoints = $input->getArgument('numberOfPenaltyPoints');
         $isPaidOnSpot = $input->getArgument('isPaidOnSpot');
 
-        if (!is_numeric($numberOfPoints) || !is_int($numberOfPoints + 0) ) {
+        if (!is_string($driverLicenseNumber)) {
+            $output->writeln('The driver license number needs to be a string');
+
+            return self::INVALID;
+        }
+
+        if (!is_string($penaltySeries)) {
+            $output->writeln('The driver license number needs to be a string');
+
+            return self::INVALID;
+        }
+
+        if (!is_numeric($numberOfPoints) || !is_int($numberOfPoints + 0)) {
             $output->writeln('The number of penalty points needs to be an integer');
 
             return self::INVALID;
         }
 
-        if (!is_numeric($penaltyNumber) || !is_int($penaltyNumber + 0) ) {
+        if (!is_numeric($penaltyNumber) || !is_int($penaltyNumber + 0)) {
             $output->writeln('The penalty number needs to be an integer');
 
             return self::INVALID;
         }
 
-        if ($isPaidOnSpot !== '0' && $isPaidOnSpot !== '1') {
+        if ('0' !== $isPaidOnSpot && '1' !== $isPaidOnSpot) {
             $output->writeln('Is paid on spot must be either 1 or 0');
 
             return self::INVALID;
@@ -55,13 +69,13 @@ final class PoliceOfficerImposePenaltyCliAdapter extends Command
 
         try {
             $this->policeOfficer->imposePenalty(
-                $input->getArgument('driverLicenseNumber'),
-                $input->getArgument('penaltySeries'),
+                $driverLicenseNumber,
+                $penaltySeries,
                 (int) $penaltyNumber,
                 (int) $numberOfPoints,
                 (bool) $isPaidOnSpot,
             );
-        } catch (\DomainException | \OutOfBoundsException $exception) {
+        } catch (\DomainException|\OutOfBoundsException $exception) {
             $output->writeln($exception->getMessage());
 
             return self::FAILURE;

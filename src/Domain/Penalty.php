@@ -6,7 +6,7 @@ namespace ddziaduch\PenaltyPoints\Domain;
 
 final readonly class Penalty
 {
-    private function  __construct(
+    private function __construct(
         public string $series,
         public int $number,
         public \DateTimeImmutable $occurredAt,
@@ -45,12 +45,12 @@ final readonly class Penalty
 
     public function isPaid(): bool
     {
-        return $this->payedAt !== null;
+        return null !== $this->payedAt;
     }
 
     public function isValid(\DateTimeImmutable $now): bool
     {
-        if ($this->payedAt === null) {
+        if (null === $this->payedAt) {
             return true;
         }
 

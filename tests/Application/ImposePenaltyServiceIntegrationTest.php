@@ -9,10 +9,13 @@ use ddziaduch\PenaltyPoints\Application\Ports\Primary\PoliceOfficer;
 use ddziaduch\PenaltyPoints\Application\Ports\Secondary\GetDriverFile;
 use ddziaduch\PenaltyPoints\Application\Ports\Secondary\StoreDriverFile;
 use ddziaduch\PenaltyPoints\Domain\DriverFile;
-use Psr\Clock\ClockInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-/** @covers \ddziaduch\PenaltyPoints\Application\PoliceOfficerService */
+/**
+ * @covers \ddziaduch\PenaltyPoints\Application\PoliceOfficerService
+ *
+ * @internal
+ */
 final class ImposePenaltyServiceIntegrationTest extends KernelTestCase
 {
     private const DRIVER_LICENSE_NUMBER = 'lorem-ipsum';

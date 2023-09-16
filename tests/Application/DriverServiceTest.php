@@ -10,12 +10,31 @@ use ddziaduch\PenaltyPoints\Application\DriverService;
 use ddziaduch\PenaltyPoints\Domain\DriverFile;
 use PHPUnit\Framework\TestCase;
 
-/** @covers \ddziaduch\PenaltyPoints\Application\DriverService */
+/**
+ * @covers \ddziaduch\PenaltyPoints\Application\DriverService
+ *
+ * @internal
+ */
 class DriverServiceTest extends TestCase
 {
     private \DateTimeImmutable $now;
     private DriverFile $driverFile;
     private DriverService $service;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->now = new \DateTimeImmutable();
+        $this->driverFile = InMemoryDriverFiles::newbieDriverFile($this->now);
+
+        $clock = new FixedClock($this->now);
+
+        $getDriverFile = new InMemoryDriverFiles($clock);
+        $getDriverFile->store($this->driverFile);
+
+        $this->service = new DriverService($clock, $getDriverFile);
+    }
 
     public function testSumOfValidPenaltyPoints(): void
     {
@@ -31,20 +50,5 @@ class DriverServiceTest extends TestCase
             $this->driverFile->isDrivingLicenseValid($this->now),
             $this->service->isDrivingLicenseValid($this->driverFile->licenseNumber),
         );
-    }
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->now = new \DateTimeImmutable();
-        $this->driverFile = InMemoryDriverFiles::newbieDriverFile($this->now);
-
-        $clock = new FixedClock($this->now);
-
-        $getDriverFile = new InMemoryDriverFiles($clock);
-        $getDriverFile->store($this->driverFile);
-
-        $this->service = new DriverService($clock, $getDriverFile);
     }
 }

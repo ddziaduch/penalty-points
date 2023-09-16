@@ -10,7 +10,11 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
-/** @covers \ddziaduch\PenaltyPoints\Adapters\Primary\Http\PoliceOfficerImposePenaltyHttpAdapter */
+/**
+ * @covers \ddziaduch\PenaltyPoints\Adapters\Primary\Http\PoliceOfficerImposePenaltyHttpAdapter
+ *
+ * @internal
+ */
 final class PoliceOfficerHttpAdapterTest extends WebTestCase
 {
     #[DataProvider('provideIsPaidOnSpot')]
@@ -48,6 +52,7 @@ final class PoliceOfficerHttpAdapterTest extends WebTestCase
     public static function provideIsPaidOnSpot(): \Generator
     {
         yield 'unpaid' => [false];
+
         yield 'paid on spot' => [true];
     }
 

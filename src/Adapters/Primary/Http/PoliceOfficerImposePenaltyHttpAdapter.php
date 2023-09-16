@@ -28,7 +28,7 @@ final readonly class PoliceOfficerImposePenaltyHttpAdapter
                 $numberOfPoints,
                 $isPaidOnSpot,
             );
-        } catch (\DomainException | \OutOfBoundsException $exception) {
+        } catch (\DomainException|\OutOfBoundsException $exception) {
             return new Response($exception->getMessage(), Response::HTTP_BAD_REQUEST);
         }
 

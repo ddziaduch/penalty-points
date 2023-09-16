@@ -7,7 +7,11 @@ namespace ddziaduch\PenaltyPoints\Tests\Domain;
 use ddziaduch\PenaltyPoints\Domain\Penalty;
 use PHPUnit\Framework\TestCase;
 
-/** @covers Penalty */
+/**
+ * @covers \Penalty
+ *
+ * @internal
+ */
 class PenaltyTest extends TestCase
 {
     /** @dataProvider provideData */

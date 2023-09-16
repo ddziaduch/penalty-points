@@ -12,8 +12,7 @@ final class DriverFile
     public function __construct(
         public readonly string $licenseNumber,
         public readonly \DateTimeImmutable $examPassedAt,
-    ) {
-    }
+    ) {}
 
     /** @throws \DomainException */
     public function imposePenalty(
@@ -33,7 +32,6 @@ final class DriverFile
 
         $this->penalties[] = $penalty;
     }
-
 
     /**
      * @throws \OutOfBoundsException
@@ -85,5 +83,4 @@ final class DriverFile
 
         return 20;
     }
-
 }

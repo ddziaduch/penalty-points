@@ -7,7 +7,11 @@ namespace ddziaduch\PenaltyPoints\Tests\Domain;
 use ddziaduch\PenaltyPoints\Domain\DriverFile;
 use PHPUnit\Framework\TestCase;
 
-/** @covers \ddziaduch\PenaltyPoints\Domain\DriverFile */
+/**
+ * @covers \ddziaduch\PenaltyPoints\Domain\DriverFile
+ *
+ * @internal
+ */
 final class DriverFileTest extends TestCase
 {
     private const LICENSE_NUMBER = '12345';
@@ -52,7 +56,7 @@ final class DriverFileTest extends TestCase
     /**
      * @dataProvider isDrivingLicenseValidDataProvider
      *
-     * @param array{ occurredAt: \DateTimeImmutable, isPaidOnSpot: bool, numberOfPoints: int } $previousPenalties
+     * @param array{ occurredAt: \DateTimeImmutable, isPaidOnSpot: bool, numberOfPoints: int }[] $previousPenalties
      */
     public function testIsDrivingLicenseValid(
         \DateTimeImmutable $examPassedAt,

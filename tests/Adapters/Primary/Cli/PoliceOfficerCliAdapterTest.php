@@ -6,13 +6,17 @@ namespace ddziaduch\PenaltyPoints\Tests\Adapters\Primary\Cli;
 
 use ddziaduch\PenaltyPoints\Application\Ports\Primary\PoliceOfficer;
 use PHPUnit\Framework\Attributes\DataProvider;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-/** @covers \ddziaduch\PenaltyPoints\Adapters\Primary\Cli\PoliceOfficerImposePenaltyCliAdapter */
+/**
+ * @covers \ddziaduch\PenaltyPoints\Adapters\Primary\Cli\PoliceOfficerImposePenaltyCliAdapter
+ *
+ * @internal
+ */
 final class PoliceOfficerCliAdapterTest extends KernelTestCase
 {
     public const DRIVER_LICENSE_NUMBER = 'lorem-ipsum';
@@ -71,6 +75,7 @@ final class PoliceOfficerCliAdapterTest extends KernelTestCase
     public static function provideExceptions(): \Generator
     {
         yield \DomainException::class => [new \DomainException('something terrible happened')];
+
         yield \OutOfBoundsException::class => [new \OutOfBoundsException('out of range sir!')];
     }
 
