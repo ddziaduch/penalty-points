@@ -15,22 +15,6 @@ final readonly class DriverService implements Driver
         private GetDriverFile $getDriverFile,
     ) {}
 
-    public function isDrivingLicenseValid(string $drivingLicenceNumber): bool
-    {
-        $driverFile = $this->getDriverFile->get($drivingLicenceNumber);
-        $now = $this->clock->now();
-
-        return $driverFile->isDrivingLicenseValid($now);
-    }
-
-    public function sumOfValidPenaltyPoints(string $drivingLicenceNumber): int
-    {
-        $driverFile = $this->getDriverFile->get($drivingLicenceNumber);
-        $now = $this->clock->now();
-
-        return $driverFile->sumOfValidPenaltyPoints($now);
-    }
-
     public function payPenalty(string $drivingLicenceNumber, string $series, int $number): void
     {
         $driverFile = $this->getDriverFile->get($drivingLicenceNumber);
