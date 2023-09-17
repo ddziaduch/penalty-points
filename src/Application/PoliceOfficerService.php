@@ -32,7 +32,7 @@ final readonly class PoliceOfficerService implements PoliceOfficer
             number: $penaltyNumber,
             occurredAt: $now,
             numberOfPoints: $numberOfPenaltyPoints,
-            isPaidOnSpot: true,
+            isPaidOnSpot: $isPaidOnSpot,
         );
 
         $this->storeDriverFile->store($driverFile);

@@ -32,12 +32,16 @@ final class ImposePenaltyServiceIntegrationTest extends KernelTestCase
         $storeDriverFile->store($driverFile);
 
         $service = $this->getService();
-        $service->imposePenalty($driverFile->licenseNumber, 'CS', 12345, 10, false);
-        $service->imposePenalty($driverFile->licenseNumber, 'CS', 12345, 10, false);
-        $service->imposePenalty($driverFile->licenseNumber, 'CS', 12345, 10, false);
+        $service->imposePenalty($driverFile->licenseNumber, 'CS', 123, 2, false);
+        $service->imposePenalty($driverFile->licenseNumber, 'CS', 456, 4, false);
+        $service->imposePenalty($driverFile->licenseNumber, 'CS', 789, 6, true);
 
         $driverFileFromStorage = $this->getDriverFile()->get(self::DRIVER_LICENSE_NUMBER);
-        self::assertFalse($driverFileFromStorage->isDrivingLicenseValid($now));
+        $driverFileFromStorage->payPenalty('CS', 123, $now);
+        $driverFileFromStorage->payPenalty('CS', 456, $now);
+
+        $this->expectException(\DomainException::class);
+        $driverFileFromStorage->payPenalty('CS', 789, $now);
     }
 
     private function getService(): PoliceOfficer

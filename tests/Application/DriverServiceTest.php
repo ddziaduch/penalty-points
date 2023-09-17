@@ -26,29 +26,33 @@ class DriverServiceTest extends TestCase
         parent::setUp();
 
         $this->now = new \DateTimeImmutable();
-        $this->driverFile = InMemoryDriverFiles::newbieDriverFile($this->now);
+        $this->driverFile = new DriverFile(
+            licenseNumber: '12345',
+            examPassedAt: (new \DateTimeImmutable())->modify('-24 months'),
+        );
 
         $clock = new FixedClock($this->now);
 
-        $getDriverFile = new InMemoryDriverFiles($clock);
-        $getDriverFile->store($this->driverFile);
+        $driverFiles = new InMemoryDriverFiles($clock);
+        $driverFiles->store($this->driverFile);
 
-        $this->service = new DriverService($clock, $getDriverFile);
+        $this->service = new DriverService($clock, $driverFiles);
     }
 
-    public function testSumOfValidPenaltyPoints(): void
+    public function testPayingPenalty(): void
     {
-        self::assertSame(
-            $this->driverFile->sumOfValidPenaltyPoints($this->now),
-            $this->service->sumOfValidPenaltyPoints($this->driverFile->licenseNumber),
-        );
-    }
+        $series = 'CD';
+        $number = 12345;
 
-    public function testIsDrivingLicenseValid(): void
-    {
-        self::assertSame(
-            $this->driverFile->isDrivingLicenseValid($this->now),
-            $this->service->isDrivingLicenseValid($this->driverFile->licenseNumber),
+        $this->driverFile->imposePenalty(
+            series: $series,
+            number: $number,
+            occurredAt: new \DateTimeImmutable(),
+            numberOfPoints: 10,
+            isPaidOnSpot: true,
         );
+
+        $this->expectException(\DomainException::class);
+        $this->service->payPenalty($this->driverFile->licenseNumber, $series, $number);
     }
 }
