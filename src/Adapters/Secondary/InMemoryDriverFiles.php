@@ -73,14 +73,14 @@ final class InMemoryDriverFiles implements GetDriverFile, StoreDriverFile
             series: 'XY',
             number: 99,
             occurredAt: $now->modify('-15 months'),
-            numberOfPoints: 15,
+            numberOfPoints: 10,
             isPaidOnSpot: true,
         );
         $pirate->imposePenalty(
             series: 'YX',
             number: 987,
             occurredAt: $now->modify('-10 days'),
-            numberOfPoints: 15,
+            numberOfPoints: 14,
             isPaidOnSpot: true,
         );
 
