@@ -32,8 +32,13 @@ final readonly class Penalty
         return new self($series, $number, $occurredAt, $occurredAt, $numberOfPoints);
     }
 
+    /** @throws \DomainException */
     public function pay(\DateTimeImmutable $payedAt): self
     {
+        if ($this->isPaid()) {
+            throw new \DomainException('Penalty already paid');
+        }
+
         return new self(
             $this->series,
             $this->number,
@@ -43,11 +48,6 @@ final readonly class Penalty
         );
     }
 
-    public function isPaid(): bool
-    {
-        return null !== $this->payedAt;
-    }
-
     public function isValid(\DateTimeImmutable $now): bool
     {
         if (null === $this->payedAt) {
@@ -55,5 +55,10 @@ final readonly class Penalty
         }
 
         return $this->payedAt->diff($now)->y < 2;
+    }
+
+    private function isPaid(): bool
+    {
+        return null !== $this->payedAt;
     }
 }
