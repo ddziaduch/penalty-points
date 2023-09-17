@@ -22,15 +22,15 @@ final class DriverFile
         int $numberOfPoints,
         bool $isPaidOnSpot,
     ): void {
-        if (!$this->isDrivingLicenseValid($occurredAt)) {
-            throw new \DomainException('Can not impose penalty, licence is not valid anymore');
-        }
-
         $penalty = $isPaidOnSpot
             ? Penalty::paidOnSpot($series, $number, $occurredAt, $numberOfPoints)
             : Penalty::unpaid($series, $number, $occurredAt, $numberOfPoints);
 
         $this->penalties[] = $penalty;
+
+        if (!$this->isDrivingLicenseValid($occurredAt)) {
+            throw new \DomainException('Can not impose penalty, licence is not valid anymore');
+        }
     }
 
     /**
@@ -44,10 +44,6 @@ final class DriverFile
     ): void {
         foreach ($this->penalties as $key => $penalty) {
             if ($penalty->series === $series && $penalty->number === $number) {
-                if ($penalty->isPaid()) {
-                    throw new \DomainException('Penalty already paid');
-                }
-
                 $this->penalties[$key] = $penalty->pay($payedAt);
 
                 return;
@@ -57,12 +53,12 @@ final class DriverFile
         throw new \OutOfBoundsException('Penalty now found');
     }
 
-    public function isDrivingLicenseValid(\DateTimeImmutable $now): bool
+    private function isDrivingLicenseValid(\DateTimeImmutable $now): bool
     {
         return $this->sumOfValidPenaltyPoints($now) <= $this->maxNumberOfPenaltyPoints($now);
     }
 
-    public function sumOfValidPenaltyPoints(\DateTimeImmutable $now): int
+    private function sumOfValidPenaltyPoints(\DateTimeImmutable $now): int
     {
         $sum = 0;
 
@@ -75,7 +71,7 @@ final class DriverFile
         return $sum;
     }
 
-    public function maxNumberOfPenaltyPoints(\DateTimeImmutable $now): int
+    private function maxNumberOfPenaltyPoints(\DateTimeImmutable $now): int
     {
         if ($this->examPassedAt->diff($now)->y >= 1) {
             return 24;
