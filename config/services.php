@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-use ddziaduch\PenaltyPoints\Adapters\Primary\Cli\PoliceOfficerImposePenaltyCliAdapter;
-use ddziaduch\PenaltyPoints\Adapters\Primary\Http\PoliceOfficerImposePenaltyHttpAdapter;
 use ddziaduch\PenaltyPoints\Adapters\Secondary\InMemoryDriverFiles;
 use ddziaduch\PenaltyPoints\Adapters\Secondary\SystemClock;
 use ddziaduch\PenaltyPoints\Application\PoliceOfficerService;
@@ -18,7 +16,7 @@ use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 return static function (ContainerConfigurator $configurator): void {
     $services = $configurator->services();
 
-    $services->defaults()->autowire(false)->autoconfigure(false);
+    $services->defaults()->autowire(false)->autoconfigure(false)->public();
 
     $services->set(ClockInterface::class, SystemClock::class);
 
@@ -34,12 +32,4 @@ return static function (ContainerConfigurator $configurator): void {
         service(GetDriverFile::class),
         service(StoreDriverFile::class),
     ]);
-
-    $services->set(PoliceOfficerImposePenaltyHttpAdapter::class)->args([
-        service(PoliceOfficer::class),
-    ])->tag('controller.service_arguments');
-
-    $services->set(PoliceOfficerImposePenaltyCliAdapter::class)->args([
-        service(PoliceOfficer::class),
-    ])->tag('console.command');
 };
