@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ddziaduch\PenaltyPoints\Tests\Application;
 
-use ddziaduch\PenaltyPoints\Adapters\Secondary\InMemoryDriverFiles;
 use ddziaduch\PenaltyPoints\Application\PoliceOfficerService;
 use ddziaduch\PenaltyPoints\Application\Ports\Secondary\GetDriverFile;
 use ddziaduch\PenaltyPoints\Application\Ports\Secondary\StoreDriverFile;
