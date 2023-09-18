@@ -29,7 +29,7 @@ final class DriverFile
         $this->penalties[] = $penalty;
 
         if (!$this->isDrivingLicenseValid($occurredAt)) {
-            throw new \DomainException('Can not impose penalty, licence is not valid anymore');
+            throw new \DomainException('Penalty imposed, but the driver\'s license is not valid anymore');
         }
     }
 
