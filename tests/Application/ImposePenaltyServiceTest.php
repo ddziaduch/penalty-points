@@ -16,7 +16,7 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
  *
  * @internal
  */
-final class ImposePenaltyServiceIntegrationTest extends KernelTestCase
+final class ImposePenaltyServiceTest extends KernelTestCase
 {
     private const DRIVER_LICENSE_NUMBER = 'lorem-ipsum';
 
