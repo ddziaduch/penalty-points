@@ -16,7 +16,7 @@ final readonly class ImposePenaltyService
         private StoreDriverFile $storeDriverFile,
     ) {}
 
-    public function imposePenalty(
+    public function impose(
         string $driverLicenseNumber,
         string $penaltySeries,
         int $penaltyNumber,

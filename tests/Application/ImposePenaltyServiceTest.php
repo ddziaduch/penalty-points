@@ -41,14 +41,14 @@ final class ImposePenaltyServiceTest extends TestCase
             $getDriverFile,
             $storeDriverFile,
         );
-        $imposePenaltyService->imposePenalty(
+        $imposePenaltyService->impose(
             driverLicenseNumber: $driverFile->licenseNumber,
             penaltySeries: 'CS',
             penaltyNumber: 123,
             numberOfPenaltyPoints: 10,
             isPaidOnSpot: false,
         );
-        $imposePenaltyService->imposePenalty(
+        $imposePenaltyService->impose(
             driverLicenseNumber: $driverFile->licenseNumber,
             penaltySeries: 'CS',
             penaltyNumber: 456,
@@ -57,7 +57,7 @@ final class ImposePenaltyServiceTest extends TestCase
         );
 
         $this->expectException(\DomainException::class); // it should store the penalty and throw the exception
-        $imposePenaltyService->imposePenalty(
+        $imposePenaltyService->impose(
             driverLicenseNumber: $driverFile->licenseNumber,
             penaltySeries: 'CS',
             penaltyNumber: 789,
@@ -78,7 +78,7 @@ final class ImposePenaltyServiceTest extends TestCase
         );
 
         $this->expectException(\OutOfBoundsException::class);
-        $imposePenaltyService->imposePenalty(
+        $imposePenaltyService->impose(
             driverLicenseNumber: 'xyz123',
             penaltySeries: 'BA',
             penaltyNumber: 999,
