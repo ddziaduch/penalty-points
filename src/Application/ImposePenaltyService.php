@@ -26,14 +26,16 @@ final readonly class ImposePenaltyService
         $now = $this->clock->now();
         $driverFile = $this->getDriverFile->get($driverLicenseNumber);
 
-        $driverFile->imposePenalty(
-            series: $penaltySeries,
-            number: $penaltyNumber,
-            occurredAt: $now,
-            numberOfPoints: $numberOfPenaltyPoints,
-            isPaidOnSpot: $isPaidOnSpot,
-        );
-
-        $this->storeDriverFile->store($driverFile);
+        try {
+            $driverFile->imposePenalty(
+                series: $penaltySeries,
+                number: $penaltyNumber,
+                occurredAt: $now,
+                numberOfPoints: $numberOfPenaltyPoints,
+                isPaidOnSpot: $isPaidOnSpot,
+            );
+        } finally {
+            $this->storeDriverFile->store($driverFile);
+        }
     }
 }
