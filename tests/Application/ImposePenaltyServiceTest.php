@@ -4,58 +4,85 @@ declare(strict_types=1);
 
 namespace ddziaduch\PenaltyPoints\Tests\Application;
 
-use ddziaduch\PenaltyPoints\Adapters\Secondary\InMemoryDriverFiles;
-use ddziaduch\PenaltyPoints\Application\Ports\Primary\ImposePenalty;
+use ddziaduch\PenaltyPoints\Adapters\Secondary\FixedClock;
+use ddziaduch\PenaltyPoints\Application\ImposePenaltyService;
 use ddziaduch\PenaltyPoints\Application\Ports\Secondary\GetDriverFile;
 use ddziaduch\PenaltyPoints\Application\Ports\Secondary\StoreDriverFile;
 use ddziaduch\PenaltyPoints\Domain\DriverFile;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \ddziaduch\PenaltyPoints\Application\ImposePenaltyService
  *
  * @internal
  */
-final class ImposePenaltyServiceTest extends KernelTestCase
+final class ImposePenaltyServiceTest extends TestCase
 {
-    private const DRIVER_LICENSE_NUMBER = 'lorem-ipsum';
-
     public function testImposesPenaltyAndStoresIt(): void
     {
         $now = new \DateTimeImmutable();
 
         $driverFile = new DriverFile(
-            self::DRIVER_LICENSE_NUMBER,
+            'lorem-ipsum',
             $now->modify('-24 months'),
         );
-        $storeDriverFile = $this->storeDriverFile();
-        $storeDriverFile->store($driverFile);
 
-        $service = $this->getService();
-        $service->impose($driverFile->licenseNumber, 'CS', 123, 2, false);
-        $service->impose($driverFile->licenseNumber, 'CS', 456, 4, false);
-        $service->impose($driverFile->licenseNumber, 'CS', 789, 6, true);
+        $clock = new FixedClock($now);
 
-        $driverFileFromStorage = $this->getDriverFile()->get(self::DRIVER_LICENSE_NUMBER);
-        $driverFileFromStorage->payPenalty('CS', 123, $now);
-        $driverFileFromStorage->payPenalty('CS', 456, $now);
+        $getDriverFile = self::createStub(GetDriverFile::class);
+        $getDriverFile->method('get')->willReturn($driverFile);
 
-        $this->expectException(\DomainException::class);
-        $driverFileFromStorage->payPenalty('CS', 789, $now);
+        $storeDriverFile = $this->createMock(StoreDriverFile::class);
+        $storeDriverFile->expects(self::exactly(3))->method('store')->with($driverFile);
+
+        $imposePenaltyService = new ImposePenaltyService(
+            $clock,
+            $getDriverFile,
+            $storeDriverFile,
+        );
+        $imposePenaltyService->impose(
+            driverLicenseNumber: $driverFile->licenseNumber,
+            penaltySeries: 'CS',
+            penaltyNumber: 123,
+            numberOfPenaltyPoints: 10,
+            isPaidOnSpot: false,
+        );
+        $imposePenaltyService->impose(
+            driverLicenseNumber: $driverFile->licenseNumber,
+            penaltySeries: 'CS',
+            penaltyNumber: 456,
+            numberOfPenaltyPoints: 10,
+            isPaidOnSpot: true,
+        );
+
+        $this->expectException(\DomainException::class); // it should store the penalty and throw the exception
+        $imposePenaltyService->impose(
+            driverLicenseNumber: $driverFile->licenseNumber,
+            penaltySeries: 'CS',
+            penaltyNumber: 789,
+            numberOfPenaltyPoints: 10,
+            isPaidOnSpot: false,
+        );
     }
 
-    private function getService(): ImposePenalty
+    public function testDriverFileDoesNotExist(): void
     {
-        return self::getContainer()->get(ImposePenalty::class);
-    }
+        $getDriverFile = self::createStub(GetDriverFile::class);
+        $getDriverFile->method('get')->willThrowException(new \OutOfBoundsException());
 
-    private function storeDriverFile(): InMemoryDriverFiles
-    {
-        return self::getContainer()->get(StoreDriverFile::class);
-    }
+        $imposePenaltyService = new ImposePenaltyService(
+            new FixedClock(new \DateTimeImmutable()),
+            $getDriverFile,
+            self::createStub(StoreDriverFile::class),
+        );
 
-    private function getDriverFile(): InMemoryDriverFiles
-    {
-        return self::getContainer()->get(GetDriverFile::class);
+        $this->expectException(\OutOfBoundsException::class);
+        $imposePenaltyService->impose(
+            driverLicenseNumber: 'xyz123',
+            penaltySeries: 'BA',
+            penaltyNumber: 999,
+            numberOfPenaltyPoints: 10,
+            isPaidOnSpot: true,
+        );
     }
 }
