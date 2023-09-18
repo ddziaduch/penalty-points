@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ddziaduch\PenaltyPoints\Tests\Application;
 
 use ddziaduch\PenaltyPoints\Adapters\Secondary\InMemoryDriverFiles;
-use ddziaduch\PenaltyPoints\Application\Ports\Primary\PoliceOfficer;
+use ddziaduch\PenaltyPoints\Application\PoliceOfficerService;
 use ddziaduch\PenaltyPoints\Application\Ports\Secondary\GetDriverFile;
 use ddziaduch\PenaltyPoints\Application\Ports\Secondary\StoreDriverFile;
 use ddziaduch\PenaltyPoints\Domain\DriverFile;
@@ -16,7 +16,7 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
  *
  * @internal
  */
-final class ImposePenaltyServiceIntegrationTest extends KernelTestCase
+final class PoliceOfficerServiceIntegrationTest extends KernelTestCase
 {
     private const DRIVER_LICENSE_NUMBER = 'lorem-ipsum';
 
@@ -44,9 +44,9 @@ final class ImposePenaltyServiceIntegrationTest extends KernelTestCase
         $driverFileFromStorage->payPenalty('CS', 789, $now);
     }
 
-    private function getService(): PoliceOfficer
+    private function getService(): PoliceOfficerService
     {
-        return self::getContainer()->get(PoliceOfficer::class);
+        return self::getContainer()->get(PoliceOfficerService::class);
     }
 
     private function storeDriverFile(): InMemoryDriverFiles

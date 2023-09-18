@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace ddziaduch\PenaltyPoints\Application;
 
-use ddziaduch\PenaltyPoints\Application\Ports\Primary\PoliceOfficer;
 use ddziaduch\PenaltyPoints\Application\Ports\Secondary\GetDriverFile;
 use ddziaduch\PenaltyPoints\Application\Ports\Secondary\StoreDriverFile;
 use Psr\Clock\ClockInterface;
 
-final readonly class PoliceOfficerService implements PoliceOfficer
+final readonly class PoliceOfficerService
 {
     public function __construct(
         private ClockInterface $clock,
