@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace ddziaduch\PenaltyPoints\Application\Ports\Primary;
 
-interface Driver
+interface PayPenalty
 {
     /** @throws \OutOfBoundsException */
-    public function payPenalty(string $drivingLicenceNumber, string $series, int $number): void;
+    public function pay(string $drivingLicenceNumber, string $series, int $number): void;
 }
