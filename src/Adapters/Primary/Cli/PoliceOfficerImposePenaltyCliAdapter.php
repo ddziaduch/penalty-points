@@ -68,7 +68,7 @@ final class PoliceOfficerImposePenaltyCliAdapter extends Command
         }
 
         try {
-            $this->policeOfficer->imposePenalty(
+            $this->policeOfficer->impose(
                 $driverLicenseNumber,
                 $penaltySeries,
                 (int) $penaltyNumber,

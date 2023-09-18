@@ -17,7 +17,7 @@ final readonly class ImposePenaltyService implements ImposePenalty
         private StoreDriverFile $storeDriverFile,
     ) {}
 
-    public function imposePenalty(
+    public function impose(
         string $driverLicenseNumber,
         string $penaltySeries,
         int $penaltyNumber,
@@ -27,14 +27,16 @@ final readonly class ImposePenaltyService implements ImposePenalty
         $now = $this->clock->now();
         $driverFile = $this->getDriverFile->get($driverLicenseNumber);
 
-        $driverFile->imposePenalty(
-            series: $penaltySeries,
-            number: $penaltyNumber,
-            occurredAt: $now,
-            numberOfPoints: $numberOfPenaltyPoints,
-            isPaidOnSpot: $isPaidOnSpot,
-        );
-
-        $this->storeDriverFile->store($driverFile);
+        try {
+            $driverFile->imposePenalty(
+                series: $penaltySeries,
+                number: $penaltyNumber,
+                occurredAt: $now,
+                numberOfPoints: $numberOfPenaltyPoints,
+                isPaidOnSpot: $isPaidOnSpot,
+            );
+        } finally {
+            $this->storeDriverFile->store($driverFile);
+        }
     }
 }

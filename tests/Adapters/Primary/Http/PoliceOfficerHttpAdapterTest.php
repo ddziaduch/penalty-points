@@ -21,7 +21,7 @@ final class PoliceOfficerHttpAdapterTest extends WebTestCase
     public function testPassesArgumentsToThePort(bool $isPaidOnSpot): void
     {
         $policeOfficer = $this->createMock(ImposePenalty::class);
-        $policeOfficer->expects(self::once())->method('imposePenalty')->with(
+        $policeOfficer->expects(self::once())->method('impose')->with(
             PoliceOfficerCliAdapterTest::DRIVER_LICENSE_NUMBER,
             PoliceOfficerCliAdapterTest::PENALTY_SERIES,
             PoliceOfficerCliAdapterTest::PENALTY_NUMBER,
@@ -60,7 +60,7 @@ final class PoliceOfficerHttpAdapterTest extends WebTestCase
     public function testOutputsExceptionsAsBadResponse(\Throwable $exception): void
     {
         $policeOfficer = $this->createStub(ImposePenalty::class);
-        $policeOfficer->method('imposePenalty')->willThrowException($exception);
+        $policeOfficer->method('impose')->willThrowException($exception);
 
         $client = self::createClient();
         self::getContainer()->set(ImposePenalty::class, $policeOfficer);

@@ -21,7 +21,7 @@ final readonly class PoliceOfficerImposePenaltyHttpAdapter
         bool $isPaidOnSpot,
     ): Response {
         try {
-            $this->policeOfficer->imposePenalty(
+            $this->policeOfficer->impose(
                 $driverLicenseNumber,
                 $penaltySeries,
                 $penaltyNumber,

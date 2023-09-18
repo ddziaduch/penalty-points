@@ -19,7 +19,7 @@ class PayPenaltyServiceTest extends TestCase
 {
     private \DateTimeImmutable $now;
     private DriverFile $driverFile;
-    private PayPenaltyService $service;
+    private PayPenaltyService $payPenaltyService;
 
     protected function setUp(): void
     {
@@ -36,7 +36,7 @@ class PayPenaltyServiceTest extends TestCase
         $driverFiles = new InMemoryDriverFiles($clock);
         $driverFiles->store($this->driverFile);
 
-        $this->service = new PayPenaltyService($clock, $driverFiles);
+        $this->payPenaltyService = new PayPenaltyService($clock, $driverFiles);
     }
 
     public function testPayingPenalty(): void
@@ -53,6 +53,6 @@ class PayPenaltyServiceTest extends TestCase
         );
 
         $this->expectException(\DomainException::class);
-        $this->service->pay($this->driverFile->licenseNumber, $series, $number);
+        $this->payPenaltyService->pay($this->driverFile->licenseNumber, $series, $number);
     }
 }

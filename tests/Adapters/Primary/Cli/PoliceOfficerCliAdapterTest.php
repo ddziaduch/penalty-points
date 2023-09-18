@@ -30,7 +30,7 @@ final class PoliceOfficerCliAdapterTest extends KernelTestCase
         $kernel = self::bootKernel();
 
         $policeOfficer = $this->createMock(ImposePenalty::class);
-        $policeOfficer->expects(self::once())->method('imposePenalty')->with(
+        $policeOfficer->expects(self::once())->method('impose')->with(
             self::DRIVER_LICENSE_NUMBER,
             self::PENALTY_SERIES,
             self::PENALTY_NUMBER,
@@ -56,7 +56,7 @@ final class PoliceOfficerCliAdapterTest extends KernelTestCase
         $kernel = self::bootKernel();
 
         $policeOfficer = $this->createStub(ImposePenalty::class);
-        $policeOfficer->method('imposePenalty')->willThrowException($exception);
+        $policeOfficer->method('impose')->willThrowException($exception);
 
         $command = $this->command($policeOfficer, $kernel);
         $commandTester = new CommandTester($command);
