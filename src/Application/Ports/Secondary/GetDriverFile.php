@@ -8,5 +8,6 @@ use ddziaduch\PenaltyPoints\Domain\DriverFile;
 
 interface GetDriverFile
 {
+    /** @throws \OutOfBoundsException */
     public function get(string $drivingLicenceNumber): DriverFile;
 }
