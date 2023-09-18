@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ddziaduch\PenaltyPoints\Adapters\Primary\Cli;
 
-use ddziaduch\PenaltyPoints\Application\Ports\Primary\PoliceOfficer;
+use ddziaduch\PenaltyPoints\Application\Ports\Primary\ImposePenalty;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -15,7 +15,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 final class PoliceOfficerImposePenaltyCliAdapter extends Command
 {
     public function __construct(
-        private readonly PoliceOfficer $policeOfficer,
+        private readonly ImposePenalty $policeOfficer,
     ) {
         parent::__construct();
     }
@@ -68,7 +68,7 @@ final class PoliceOfficerImposePenaltyCliAdapter extends Command
         }
 
         try {
-            $this->policeOfficer->imposePenalty(
+            $this->policeOfficer->impose(
                 $driverLicenseNumber,
                 $penaltySeries,
                 (int) $penaltyNumber,

@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace ddziaduch\PenaltyPoints\Adapters\Primary\Http;
 
-use ddziaduch\PenaltyPoints\Application\Ports\Primary\PoliceOfficer;
+use ddziaduch\PenaltyPoints\Application\Ports\Primary\ImposePenalty;
 use Symfony\Component\HttpFoundation\Response;
 
 final readonly class PoliceOfficerImposePenaltyHttpAdapter
 {
     public function __construct(
-        private PoliceOfficer $policeOfficer,
+        private ImposePenalty $policeOfficer,
     ) {}
 
     public function __invoke(
@@ -21,7 +21,7 @@ final readonly class PoliceOfficerImposePenaltyHttpAdapter
         bool $isPaidOnSpot,
     ): Response {
         try {
-            $this->policeOfficer->imposePenalty(
+            $this->policeOfficer->impose(
                 $driverLicenseNumber,
                 $penaltySeries,
                 $penaltyNumber,

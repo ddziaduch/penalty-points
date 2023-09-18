@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace ddziaduch\PenaltyPoints\Tests\Application;
 
 use ddziaduch\PenaltyPoints\Adapters\Secondary\InMemoryDriverFiles;
-use ddziaduch\PenaltyPoints\Application\Ports\Primary\PoliceOfficer;
+use ddziaduch\PenaltyPoints\Application\Ports\Primary\ImposePenalty;
 use ddziaduch\PenaltyPoints\Application\Ports\Secondary\GetDriverFile;
 use ddziaduch\PenaltyPoints\Application\Ports\Secondary\StoreDriverFile;
 use ddziaduch\PenaltyPoints\Domain\DriverFile;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 /**
- * @covers \ddziaduch\PenaltyPoints\Application\PoliceOfficerService
+ * @covers \ddziaduch\PenaltyPoints\Application\ImposePenaltyService
  *
  * @internal
  */
@@ -32,9 +32,9 @@ final class ImposePenaltyServiceIntegrationTest extends KernelTestCase
         $storeDriverFile->store($driverFile);
 
         $service = $this->getService();
-        $service->imposePenalty($driverFile->licenseNumber, 'CS', 123, 2, false);
-        $service->imposePenalty($driverFile->licenseNumber, 'CS', 456, 4, false);
-        $service->imposePenalty($driverFile->licenseNumber, 'CS', 789, 6, true);
+        $service->impose($driverFile->licenseNumber, 'CS', 123, 2, false);
+        $service->impose($driverFile->licenseNumber, 'CS', 456, 4, false);
+        $service->impose($driverFile->licenseNumber, 'CS', 789, 6, true);
 
         $driverFileFromStorage = $this->getDriverFile()->get(self::DRIVER_LICENSE_NUMBER);
         $driverFileFromStorage->payPenalty('CS', 123, $now);
@@ -44,9 +44,9 @@ final class ImposePenaltyServiceIntegrationTest extends KernelTestCase
         $driverFileFromStorage->payPenalty('CS', 789, $now);
     }
 
-    private function getService(): PoliceOfficer
+    private function getService(): ImposePenalty
     {
-        return self::getContainer()->get(PoliceOfficer::class);
+        return self::getContainer()->get(ImposePenalty::class);
     }
 
     private function storeDriverFile(): InMemoryDriverFiles

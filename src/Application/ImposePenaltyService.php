@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace ddziaduch\PenaltyPoints\Application;
 
-use ddziaduch\PenaltyPoints\Application\Ports\Primary\PoliceOfficer;
+use ddziaduch\PenaltyPoints\Application\Ports\Primary\ImposePenalty;
 use ddziaduch\PenaltyPoints\Application\Ports\Secondary\GetDriverFile;
 use ddziaduch\PenaltyPoints\Application\Ports\Secondary\StoreDriverFile;
 use Psr\Clock\ClockInterface;
 
-final readonly class PoliceOfficerService implements PoliceOfficer
+final readonly class ImposePenaltyService implements ImposePenalty
 {
     public function __construct(
         private ClockInterface $clock,
@@ -17,7 +17,7 @@ final readonly class PoliceOfficerService implements PoliceOfficer
         private StoreDriverFile $storeDriverFile,
     ) {}
 
-    public function imposePenalty(
+    public function impose(
         string $driverLicenseNumber,
         string $penaltySeries,
         int $penaltyNumber,
@@ -27,14 +27,16 @@ final readonly class PoliceOfficerService implements PoliceOfficer
         $now = $this->clock->now();
         $driverFile = $this->getDriverFile->get($driverLicenseNumber);
 
-        $driverFile->imposePenalty(
-            series: $penaltySeries,
-            number: $penaltyNumber,
-            occurredAt: $now,
-            numberOfPoints: $numberOfPenaltyPoints,
-            isPaidOnSpot: $isPaidOnSpot,
-        );
-
-        $this->storeDriverFile->store($driverFile);
+        try {
+            $driverFile->imposePenalty(
+                series: $penaltySeries,
+                number: $penaltyNumber,
+                occurredAt: $now,
+                numberOfPoints: $numberOfPenaltyPoints,
+                isPaidOnSpot: $isPaidOnSpot,
+            );
+        } finally {
+            $this->storeDriverFile->store($driverFile);
+        }
     }
 }

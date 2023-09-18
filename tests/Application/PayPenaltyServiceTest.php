@@ -6,20 +6,20 @@ namespace ddziaduch\PenaltyPoints\Tests\Application;
 
 use ddziaduch\PenaltyPoints\Adapters\Secondary\FixedClock;
 use ddziaduch\PenaltyPoints\Adapters\Secondary\InMemoryDriverFiles;
-use ddziaduch\PenaltyPoints\Application\DriverService;
+use ddziaduch\PenaltyPoints\Application\PayPenaltyService;
 use ddziaduch\PenaltyPoints\Domain\DriverFile;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \ddziaduch\PenaltyPoints\Application\DriverService
+ * @covers \ddziaduch\PenaltyPoints\Application\PayPenaltyService
  *
  * @internal
  */
-class DriverServiceTest extends TestCase
+class PayPenaltyServiceTest extends TestCase
 {
     private \DateTimeImmutable $now;
     private DriverFile $driverFile;
-    private DriverService $service;
+    private PayPenaltyService $service;
 
     protected function setUp(): void
     {
@@ -36,7 +36,7 @@ class DriverServiceTest extends TestCase
         $driverFiles = new InMemoryDriverFiles($clock);
         $driverFiles->store($this->driverFile);
 
-        $this->service = new DriverService($clock, $driverFiles);
+        $this->service = new PayPenaltyService($clock, $driverFiles);
     }
 
     public function testPayingPenalty(): void
@@ -53,6 +53,6 @@ class DriverServiceTest extends TestCase
         );
 
         $this->expectException(\DomainException::class);
-        $this->service->payPenalty($this->driverFile->licenseNumber, $series, $number);
+        $this->service->pay($this->driverFile->licenseNumber, $series, $number);
     }
 }

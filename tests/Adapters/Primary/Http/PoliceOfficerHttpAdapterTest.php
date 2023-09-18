@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ddziaduch\PenaltyPoints\Tests\Adapters\Primary\Http;
 
-use ddziaduch\PenaltyPoints\Application\Ports\Primary\PoliceOfficer;
+use ddziaduch\PenaltyPoints\Application\Ports\Primary\ImposePenalty;
 use ddziaduch\PenaltyPoints\Tests\Adapters\Primary\Cli\PoliceOfficerCliAdapterTest;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -20,8 +20,8 @@ final class PoliceOfficerHttpAdapterTest extends WebTestCase
     #[DataProvider('provideIsPaidOnSpot')]
     public function testPassesArgumentsToThePort(bool $isPaidOnSpot): void
     {
-        $policeOfficer = $this->createMock(PoliceOfficer::class);
-        $policeOfficer->expects(self::once())->method('imposePenalty')->with(
+        $policeOfficer = $this->createMock(ImposePenalty::class);
+        $policeOfficer->expects(self::once())->method('impose')->with(
             PoliceOfficerCliAdapterTest::DRIVER_LICENSE_NUMBER,
             PoliceOfficerCliAdapterTest::PENALTY_SERIES,
             PoliceOfficerCliAdapterTest::PENALTY_NUMBER,
@@ -30,7 +30,7 @@ final class PoliceOfficerHttpAdapterTest extends WebTestCase
         );
 
         $client = self::createClient();
-        self::getContainer()->set(PoliceOfficer::class, $policeOfficer);
+        self::getContainer()->set(ImposePenalty::class, $policeOfficer);
 
         $client->request(
             method: 'POST',
@@ -59,11 +59,11 @@ final class PoliceOfficerHttpAdapterTest extends WebTestCase
     #[DataProvider('provideExceptions')]
     public function testOutputsExceptionsAsBadResponse(\Throwable $exception): void
     {
-        $policeOfficer = $this->createStub(PoliceOfficer::class);
-        $policeOfficer->method('imposePenalty')->willThrowException($exception);
+        $policeOfficer = $this->createStub(ImposePenalty::class);
+        $policeOfficer->method('impose')->willThrowException($exception);
 
         $client = self::createClient();
-        self::getContainer()->set(PoliceOfficer::class, $policeOfficer);
+        self::getContainer()->set(ImposePenalty::class, $policeOfficer);
 
         $client->request(
             method: 'POST',

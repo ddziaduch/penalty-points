@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ddziaduch\PenaltyPoints\Tests\Adapters\Primary\Cli;
 
-use ddziaduch\PenaltyPoints\Application\Ports\Primary\PoliceOfficer;
+use ddziaduch\PenaltyPoints\Application\Ports\Primary\ImposePenalty;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -29,8 +29,8 @@ final class PoliceOfficerCliAdapterTest extends KernelTestCase
     {
         $kernel = self::bootKernel();
 
-        $policeOfficer = $this->createMock(PoliceOfficer::class);
-        $policeOfficer->expects(self::once())->method('imposePenalty')->with(
+        $policeOfficer = $this->createMock(ImposePenalty::class);
+        $policeOfficer->expects(self::once())->method('impose')->with(
             self::DRIVER_LICENSE_NUMBER,
             self::PENALTY_SERIES,
             self::PENALTY_NUMBER,
@@ -55,8 +55,8 @@ final class PoliceOfficerCliAdapterTest extends KernelTestCase
     {
         $kernel = self::bootKernel();
 
-        $policeOfficer = $this->createStub(PoliceOfficer::class);
-        $policeOfficer->method('imposePenalty')->willThrowException($exception);
+        $policeOfficer = $this->createStub(ImposePenalty::class);
+        $policeOfficer->method('impose')->willThrowException($exception);
 
         $command = $this->command($policeOfficer, $kernel);
         $commandTester = new CommandTester($command);
@@ -79,9 +79,9 @@ final class PoliceOfficerCliAdapterTest extends KernelTestCase
         yield \OutOfBoundsException::class => [new \OutOfBoundsException('out of range sir!')];
     }
 
-    private function command(PoliceOfficer $policeOfficer, KernelInterface $kernel): Command
+    private function command(ImposePenalty $policeOfficer, KernelInterface $kernel): Command
     {
-        self::getContainer()->set(PoliceOfficer::class, $policeOfficer);
+        self::getContainer()->set(ImposePenalty::class, $policeOfficer);
 
         return (new Application($kernel))->find('police-officer:impose-penalty');
     }
