@@ -8,7 +8,7 @@ use ddziaduch\PenaltyPoints\Application\Ports\Secondary\GetDriverFile;
 use ddziaduch\PenaltyPoints\Application\Ports\Secondary\StoreDriverFile;
 use Psr\Clock\ClockInterface;
 
-final readonly class PoliceOfficerService
+final readonly class ImposePenaltyService
 {
     public function __construct(
         private ClockInterface $clock,

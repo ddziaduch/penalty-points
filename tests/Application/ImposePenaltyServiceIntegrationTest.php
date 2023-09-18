@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace ddziaduch\PenaltyPoints\Tests\Application;
 
-use ddziaduch\PenaltyPoints\Application\PoliceOfficerService;
+use ddziaduch\PenaltyPoints\Application\ImposePenaltyService;
 use ddziaduch\PenaltyPoints\Application\Ports\Secondary\GetDriverFile;
 use ddziaduch\PenaltyPoints\Application\Ports\Secondary\StoreDriverFile;
 use ddziaduch\PenaltyPoints\Domain\DriverFile;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 /**
- * @covers \ddziaduch\PenaltyPoints\Application\PoliceOfficerService
+ * @covers \ddziaduch\PenaltyPoints\Application\ImposePenaltyService
  *
  * @internal
  */
-final class PoliceOfficerServiceIntegrationTest extends KernelTestCase
+final class ImposePenaltyServiceIntegrationTest extends KernelTestCase
 {
     private const DRIVER_LICENSE_NUMBER = 'lorem-ipsum';
 
@@ -32,22 +32,22 @@ final class PoliceOfficerServiceIntegrationTest extends KernelTestCase
         $storeDriverFile = $container->get(StoreDriverFile::class);
         $storeDriverFile->store($driverFile);
 
-        $service = $container->get(PoliceOfficerService::class);
-        $service->imposePenalty(
+        $imposePenaltyService = $container->get(ImposePenaltyService::class);
+        $imposePenaltyService->imposePenalty(
             driverLicenseNumber: $driverFile->licenseNumber,
             penaltySeries: 'CS',
             penaltyNumber: 123,
             numberOfPenaltyPoints: 2,
             isPaidOnSpot: false,
         );
-        $service->imposePenalty(
+        $imposePenaltyService->imposePenalty(
             driverLicenseNumber: $driverFile->licenseNumber,
             penaltySeries: 'CS',
             penaltyNumber: 456,
             numberOfPenaltyPoints: 4,
             isPaidOnSpot: false,
         );
-        $service->imposePenalty(
+        $imposePenaltyService->imposePenalty(
             driverLicenseNumber: $driverFile->licenseNumber,
             penaltySeries: 'CS',
             penaltyNumber: 789,
@@ -65,10 +65,10 @@ final class PoliceOfficerServiceIntegrationTest extends KernelTestCase
 
     public function testDriverFileDoesNotExist(): void
     {
-        $service = self::getContainer()->get(PoliceOfficerService::class);
+        $imposePenaltyService = self::getContainer()->get(ImposePenaltyService::class);
 
         $this->expectException(\OutOfBoundsException::class);
-        $service->imposePenalty(
+        $imposePenaltyService->imposePenalty(
             driverLicenseNumber: 'xyz123',
             penaltySeries: 'BA',
             penaltyNumber: 999,

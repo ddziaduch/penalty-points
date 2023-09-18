@@ -4,6 +4,4 @@ declare(strict_types=1);
 
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
-return static function (RoutingConfigurator $configurator): void {
-
-};
+return static function (RoutingConfigurator $configurator): void {};
