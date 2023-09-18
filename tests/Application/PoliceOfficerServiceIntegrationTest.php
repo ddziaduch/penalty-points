@@ -22,21 +22,41 @@ final class PoliceOfficerServiceIntegrationTest extends KernelTestCase
 
     public function testImposesPenaltyAndStoresIt(): void
     {
+        $container = self::getContainer();
         $now = new \DateTimeImmutable();
 
         $driverFile = new DriverFile(
             self::DRIVER_LICENSE_NUMBER,
             $now->modify('-24 months'),
         );
-        $storeDriverFile = $this->storeDriverFile();
+
+        $storeDriverFile = $container->get(StoreDriverFile::class);
         $storeDriverFile->store($driverFile);
 
-        $service = $this->getService();
-        $service->imposePenalty($driverFile->licenseNumber, 'CS', 123, 2, false);
-        $service->imposePenalty($driverFile->licenseNumber, 'CS', 456, 4, false);
-        $service->imposePenalty($driverFile->licenseNumber, 'CS', 789, 6, true);
+        $service = $container->get(PoliceOfficerService::class);
+        $service->imposePenalty(
+            driverLicenseNumber: $driverFile->licenseNumber,
+            penaltySeries: 'CS',
+            penaltyNumber: 123,
+            numberOfPenaltyPoints: 2,
+            isPaidOnSpot: false,
+        );
+        $service->imposePenalty(
+            driverLicenseNumber: $driverFile->licenseNumber,
+            penaltySeries: 'CS',
+            penaltyNumber: 456,
+            numberOfPenaltyPoints: 4,
+            isPaidOnSpot: false,
+        );
+        $service->imposePenalty(
+            driverLicenseNumber: $driverFile->licenseNumber,
+            penaltySeries: 'CS',
+            penaltyNumber: 789,
+            numberOfPenaltyPoints: 6,
+            isPaidOnSpot: true,
+        );
 
-        $driverFileFromStorage = $this->getDriverFile()->get(self::DRIVER_LICENSE_NUMBER);
+        $driverFileFromStorage = $container->get(GetDriverFile::class)->get(self::DRIVER_LICENSE_NUMBER);
         $driverFileFromStorage->payPenalty('CS', 123, $now);
         $driverFileFromStorage->payPenalty('CS', 456, $now);
 
@@ -44,18 +64,17 @@ final class PoliceOfficerServiceIntegrationTest extends KernelTestCase
         $driverFileFromStorage->payPenalty('CS', 789, $now);
     }
 
-    private function getService(): PoliceOfficerService
+    public function testDriverFileDoesNotExist(): void
     {
-        return self::getContainer()->get(PoliceOfficerService::class);
-    }
+        $service = self::getContainer()->get(PoliceOfficerService::class);
 
-    private function storeDriverFile(): InMemoryDriverFiles
-    {
-        return self::getContainer()->get(StoreDriverFile::class);
-    }
-
-    private function getDriverFile(): InMemoryDriverFiles
-    {
-        return self::getContainer()->get(GetDriverFile::class);
+        $this->expectException(\OutOfBoundsException::class);
+        $service->imposePenalty(
+            driverLicenseNumber: 'xyz123',
+            penaltySeries: 'BA',
+            penaltyNumber: 999,
+            numberOfPenaltyPoints: 10,
+            isPaidOnSpot: true,
+        );
     }
 }
