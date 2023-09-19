@@ -53,12 +53,12 @@ final class DriverFile
         throw new \OutOfBoundsException('Penalty now found');
     }
 
-    private function isDrivingLicenseValid(\DateTimeImmutable $now): bool
+    public function isDrivingLicenseValid(\DateTimeImmutable $now): bool
     {
         return $this->sumOfValidPenaltyPoints($now) <= $this->maxNumberOfPenaltyPoints($now);
     }
 
-    private function sumOfValidPenaltyPoints(\DateTimeImmutable $now): int
+    public function sumOfValidPenaltyPoints(\DateTimeImmutable $now): int
     {
         $sum = 0;
 
