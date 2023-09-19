@@ -42,9 +42,9 @@ final class DriverFile
         int $number,
         \DateTimeImmutable $payedAt,
     ): void {
-        foreach ($this->penalties as $key => $penalty) {
+        foreach ($this->penalties as $penalty) {
             if ($penalty->series === $series && $penalty->number === $number) {
-                $this->penalties[$key] = $penalty->pay($payedAt);
+                $penalty->pay($payedAt);
 
                 return;
             }

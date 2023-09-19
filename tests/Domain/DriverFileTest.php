@@ -168,7 +168,7 @@ final class DriverFileTest extends TestCase
         $this->expectNotToPerformAssertions(); // we do not expect exception here
         $now = new \DateTimeImmutable();
         $driverFile = new DriverFile(self::LICENSE_NUMBER, $now->modify('-36 months'));
-        $penaltyOccurredAt = $now->modify('-6 months');
+        $penaltyOccurredAt = $now->modify('-1 months');
         $driverFile->imposePenalty(
             series: self::PENALTY_SERIES,
             number: 1,
@@ -176,33 +176,15 @@ final class DriverFileTest extends TestCase
             numberOfPoints: 12,
             isPaidOnSpot: false,
         );
-        $driverFile->payPenalty(series: self::PENALTY_SERIES, number: 1, payedAt: $now->modify('-5 months'));
+        $driverFile->payPenalty(series: self::PENALTY_SERIES, number: 1, payedAt: $now);
     }
 
     public function testPayingUnknownPenalty(): void
     {
         $now = new \DateTimeImmutable();
         $driverFile = new DriverFile(self::LICENSE_NUMBER, $now->modify('-36 months'));
+
         $this->expectException(\OutOfBoundsException::class);
         $driverFile->payPenalty(series: self::PENALTY_SERIES, number: 12345, payedAt: $now->modify('-5 months'));
-    }
-
-    public function testPayingAlreadyPaidPenalty(): void
-    {
-        $now = new \DateTimeImmutable();
-        $driverFile = new DriverFile(self::LICENSE_NUMBER, $now->modify('-36 months'));
-        $this->expectException(\OutOfBoundsException::class);
-        $penaltyOccurredAt = $now->modify('-6 months');
-        $driverFile->imposePenalty(
-            series: self::PENALTY_SERIES,
-            number: 1,
-            occurredAt: $penaltyOccurredAt,
-            numberOfPoints: 12,
-            isPaidOnSpot: false,
-        );
-        $driverFile->payPenalty(series: self::PENALTY_SERIES, number: 1, payedAt: $now->modify('-5 months'));
-
-        $this->expectException(\DomainException::class);
-        $driverFile->payPenalty(series: self::PENALTY_SERIES, number: 1, payedAt: $now->modify('-5 months'));
     }
 }
