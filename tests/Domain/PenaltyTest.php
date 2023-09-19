@@ -68,4 +68,31 @@ class PenaltyTest extends TestCase
             'now' => $now,
         ];
     }
+
+    public function testPayingAlreadyPaidPenalty(): void
+    {
+        $penalty = Penalty::paidOnSpot(
+            series: 'CD',
+            number: 12345,
+            occurredAt: new \DateTimeImmutable(),
+            numberOfPoints: 10,
+        );
+
+        $this->expectException(\DomainException::class);
+        $penalty->pay(payedAt: new \DateTimeImmutable());
+    }
+
+    public function testPayingUnpaidPenalty(): void
+    {
+        $penalty = Penalty::unpaid(
+            series: 'CD',
+            number: 12345,
+            occurredAt: new \DateTimeImmutable(),
+            numberOfPoints: 10,
+        );
+
+        self::assertFalse($penalty->isPaid());
+        $penalty->pay(payedAt: new \DateTimeImmutable());
+        self::assertTrue($penalty->isPaid());
+    }
 }
