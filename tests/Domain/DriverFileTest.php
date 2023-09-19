@@ -26,19 +26,29 @@ final class DriverFileTest extends TestCase
         \DateTimeImmutable $examPassedAt,
         array $penalties,
     ): void {
-        $this->expectNotToPerformAssertions(); // we do not expect exception here
+        assert(!empty($penalties));
 
         $driverFile = new DriverFile(self::LICENSE_NUMBER, $examPassedAt);
+        $sumOfPoints = 0;
 
-        foreach ($penalties as $number => $previousPenalty) {
+        foreach ($penalties as $number => $penalty) {
+            $sumOfPoints += $penalty['numberOfPoints'];
             $driverFile->imposePenalty(
                 self::PENALTY_SERIES,
                 $number,
-                occurredAt: $previousPenalty['occurredAt'],
-                numberOfPoints: $previousPenalty['numberOfPoints'],
-                isPaidOnSpot: $previousPenalty['isPaidOnSpot'],
+                occurredAt: $penalty['occurredAt'],
+                numberOfPoints: $penalty['numberOfPoints'],
+                isPaidOnSpot: $penalty['isPaidOnSpot'],
             );
         }
+
+        self::assertTrue(
+            $driverFile->isDrivingLicenseValid($penalty['occurredAt']),
+        );
+        self::assertSame(
+            $sumOfPoints,
+            $driverFile->sumOfValidPenaltyPoints($penalty['occurredAt']),
+        );
     }
 
     public static function imposingPenaltiesWithoutReachingLimitsDataProvider(): \Generator
@@ -97,16 +107,42 @@ final class DriverFileTest extends TestCase
         \DateTimeImmutable $examPassedAt,
         array $penalties,
     ): void {
+        assert(!empty($penalties));
+
         $driverFile = new DriverFile(self::LICENSE_NUMBER, $examPassedAt);
+        $sumOfPoints = array_reduce(
+            $penalties,
+            static fn (int $sum, array $penalty): int => $penalty['numberOfPoints'] + $sum,
+            initial: 0
+        );
+        $lastPenalty = array_pop($penalties);
+
+        foreach ($penalties as $number => $penalty) {
+            $driverFile->imposePenalty(
+                series: self::PENALTY_SERIES,
+                number: $number,
+                occurredAt: $penalty['occurredAt'],
+                numberOfPoints: $penalty['numberOfPoints'],
+                isPaidOnSpot: $penalty['isPaidOnSpot'],
+            );
+        }
 
         $this->expectException(\DomainException::class);
-        foreach ($penalties as $number => $previousPenalty) {
+        try {
             $driverFile->imposePenalty(
-                self::PENALTY_SERIES,
-                $number,
-                occurredAt: $previousPenalty['occurredAt'],
-                numberOfPoints: $previousPenalty['numberOfPoints'],
-                isPaidOnSpot: $previousPenalty['isPaidOnSpot'],
+                series: self::PENALTY_SERIES,
+                number: 999,
+                occurredAt: $lastPenalty['occurredAt'],
+                numberOfPoints: $lastPenalty['numberOfPoints'],
+                isPaidOnSpot: $lastPenalty['isPaidOnSpot'],
+            );
+        } finally {
+            self::assertFalse(
+                $driverFile->isDrivingLicenseValid($lastPenalty['occurredAt']),
+            );
+            self::assertSame(
+                $sumOfPoints,
+                $driverFile->sumOfValidPenaltyPoints($lastPenalty['occurredAt']),
             );
         }
     }
@@ -168,11 +204,10 @@ final class DriverFileTest extends TestCase
         $this->expectNotToPerformAssertions(); // we do not expect exception here
         $now = new \DateTimeImmutable();
         $driverFile = new DriverFile(self::LICENSE_NUMBER, $now->modify('-36 months'));
-        $penaltyOccurredAt = $now->modify('-1 months');
         $driverFile->imposePenalty(
             series: self::PENALTY_SERIES,
             number: 1,
-            occurredAt: $penaltyOccurredAt,
+            occurredAt: $now->modify('-1 months'),
             numberOfPoints: 12,
             isPaidOnSpot: false,
         );
