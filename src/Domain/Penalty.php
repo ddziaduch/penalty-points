@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace ddziaduch\PenaltyPoints\Domain;
 
-final readonly class Penalty
+final class Penalty
 {
     private function __construct(
-        public string $series,
-        public int $number,
-        public \DateTimeImmutable $occurredAt,
+        public readonly string $series,
+        public readonly int $number,
+        public readonly \DateTimeImmutable $occurredAt,
         public ?\DateTimeImmutable $payedAt,
-        public int $numberOfPoints,
+        public readonly int $numberOfPoints,
     ) {}
 
     public static function unpaid(
@@ -33,19 +33,13 @@ final readonly class Penalty
     }
 
     /** @throws \DomainException */
-    public function pay(\DateTimeImmutable $payedAt): self
+    public function pay(\DateTimeImmutable $payedAt): void
     {
         if ($this->isPaid()) {
             throw new \DomainException('Penalty already paid');
         }
 
-        return new self(
-            $this->series,
-            $this->number,
-            $this->occurredAt,
-            $payedAt,
-            $this->numberOfPoints,
-        );
+        $this->payedAt = $payedAt;
     }
 
     public function isValid(\DateTimeImmutable $now): bool
@@ -57,7 +51,7 @@ final readonly class Penalty
         return $this->payedAt->diff($now)->y < 2;
     }
 
-    private function isPaid(): bool
+    public function isPaid(): bool
     {
         return null !== $this->payedAt;
     }
