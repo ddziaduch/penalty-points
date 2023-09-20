@@ -19,9 +19,7 @@ return static function (ContainerConfigurator $configurator): void {
 
     $services->set(ClockInterface::class, SystemClock::class);
 
-    $services->set(InMemoryDriverFiles::class)->args([
-        service(ClockInterface::class),
-    ]);
+    $services->set(InMemoryDriverFiles::class);
 
     $services->alias(StoreDriverFile::class, InMemoryDriverFiles::class);
     $services->alias(GetDriverFile::class, InMemoryDriverFiles::class);
