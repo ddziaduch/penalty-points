@@ -2,12 +2,15 @@
 
 declare(strict_types=1);
 
-use ddziaduch\PenaltyPoints\Adapters\Primary\Cli\PoliceOfficerImposePenaltyCliAdapter;
-use ddziaduch\PenaltyPoints\Adapters\Primary\Http\PoliceOfficerImposePenaltyHttpAdapter;
+use ddziaduch\PenaltyPoints\Adapters\Primary\Cli\ImposePenaltyCliAdapter;
+use ddziaduch\PenaltyPoints\Adapters\Primary\Http\ImposePenaltyHttpAdapter;
+use ddziaduch\PenaltyPoints\Adapters\Primary\Http\PayPenaltyHttpAdapter;
 use ddziaduch\PenaltyPoints\Adapters\Secondary\InMemoryDriverFiles;
 use ddziaduch\PenaltyPoints\Adapters\Secondary\SystemClock;
 use ddziaduch\PenaltyPoints\Application\ImposePenaltyService;
+use ddziaduch\PenaltyPoints\Application\PayPenaltyService;
 use ddziaduch\PenaltyPoints\Application\Ports\Primary\ImposePenalty;
+use ddziaduch\PenaltyPoints\Application\Ports\Primary\PayPenalty;
 use ddziaduch\PenaltyPoints\Application\Ports\Secondary\GetDriverFile;
 use ddziaduch\PenaltyPoints\Application\Ports\Secondary\StoreDriverFile;
 use Psr\Clock\ClockInterface;
@@ -33,11 +36,20 @@ return static function (ContainerConfigurator $configurator): void {
         service(StoreDriverFile::class),
     ]);
 
-    $services->set(PoliceOfficerImposePenaltyHttpAdapter::class)->args([
+    $services->set(PayPenalty::class, PayPenaltyService::class)->args([
+        service(ClockInterface::class),
+        service(GetDriverFile::class),
+    ]);
+
+    $services->set(ImposePenaltyHttpAdapter::class)->args([
         service(ImposePenalty::class),
     ])->tag('controller.service_arguments');
 
-    $services->set(PoliceOfficerImposePenaltyCliAdapter::class)->args([
+    $services->set(PayPenaltyHttpAdapter::class)->args([
+        service(PayPenalty::class),
+    ])->tag('controller.service_arguments');
+
+    $services->set(ImposePenaltyCliAdapter::class)->args([
         service(ImposePenalty::class),
     ])->tag('console.command');
 };

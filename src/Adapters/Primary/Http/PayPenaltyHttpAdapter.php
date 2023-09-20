@@ -4,29 +4,25 @@ declare(strict_types=1);
 
 namespace ddziaduch\PenaltyPoints\Adapters\Primary\Http;
 
-use ddziaduch\PenaltyPoints\Application\Ports\Primary\ImposePenalty;
+use ddziaduch\PenaltyPoints\Application\Ports\Primary\PayPenalty;
 use Symfony\Component\HttpFoundation\Response;
 
-final readonly class PoliceOfficerImposePenaltyHttpAdapter
+final readonly class PayPenaltyHttpAdapter
 {
     public function __construct(
-        private ImposePenalty $policeOfficer,
+        private PayPenalty $payPenalty,
     ) {}
 
     public function __invoke(
         string $driverLicenseNumber,
         string $penaltySeries,
         int $penaltyNumber,
-        int $numberOfPoints,
-        bool $isPaidOnSpot,
     ): Response {
         try {
-            $this->policeOfficer->impose(
+            $this->payPenalty->pay(
                 $driverLicenseNumber,
                 $penaltySeries,
                 $penaltyNumber,
-                $numberOfPoints,
-                $isPaidOnSpot,
             );
         } catch (\DomainException|\OutOfBoundsException $exception) {
             return new Response($exception->getMessage(), Response::HTTP_BAD_REQUEST);
