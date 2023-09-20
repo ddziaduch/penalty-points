@@ -53,6 +53,7 @@ final class ImposePenaltyServiceTest extends TestCase
         );
 
         $this->expectException(\DomainException::class);
+
         try {
             $imposePenaltyService->impose(
                 driverLicenseNumber: $driverFile->licenseNumber,

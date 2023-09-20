@@ -12,10 +12,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(name: 'police-officer:impose-penalty', description: 'Allows to impose a new penalty to the driver')]
-final class PoliceOfficerImposePenaltyCliAdapter extends Command
+final class ImposePenaltyCliAdapter extends Command
 {
     public function __construct(
-        private readonly ImposePenalty $policeOfficer,
+        private readonly ImposePenalty $imposePenalty,
     ) {
         parent::__construct();
     }
@@ -68,7 +68,7 @@ final class PoliceOfficerImposePenaltyCliAdapter extends Command
         }
 
         try {
-            $this->policeOfficer->impose(
+            $this->imposePenalty->impose(
                 $driverLicenseNumber,
                 $penaltySeries,
                 (int) $penaltyNumber,

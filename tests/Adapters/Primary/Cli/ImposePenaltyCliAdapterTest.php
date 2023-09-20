@@ -13,11 +13,11 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
- * @covers \ddziaduch\PenaltyPoints\Adapters\Primary\Cli\PoliceOfficerImposePenaltyCliAdapter
+ * @covers \ddziaduch\PenaltyPoints\Adapters\Primary\Cli\ImposePenaltyCliAdapter
  *
  * @internal
  */
-final class PoliceOfficerCliAdapterTest extends KernelTestCase
+final class ImposePenaltyCliAdapterTest extends KernelTestCase
 {
     public const DRIVER_LICENSE_NUMBER = 'lorem-ipsum';
     public const PENALTY_POINTS = 10;
@@ -29,8 +29,8 @@ final class PoliceOfficerCliAdapterTest extends KernelTestCase
     {
         $kernel = self::bootKernel();
 
-        $policeOfficer = $this->createMock(ImposePenalty::class);
-        $policeOfficer->expects(self::once())->method('impose')->with(
+        $imposePenalty = $this->createMock(ImposePenalty::class);
+        $imposePenalty->expects(self::once())->method('impose')->with(
             self::DRIVER_LICENSE_NUMBER,
             self::PENALTY_SERIES,
             self::PENALTY_NUMBER,
@@ -38,7 +38,7 @@ final class PoliceOfficerCliAdapterTest extends KernelTestCase
             self::IS_PAID_ON_SPOT,
         );
 
-        $command = $this->command($policeOfficer, $kernel);
+        $command = $this->command($imposePenalty, $kernel);
         $commandTester = new CommandTester($command);
 
         $commandTester->execute([
@@ -55,10 +55,10 @@ final class PoliceOfficerCliAdapterTest extends KernelTestCase
     {
         $kernel = self::bootKernel();
 
-        $policeOfficer = $this->createStub(ImposePenalty::class);
-        $policeOfficer->method('impose')->willThrowException($exception);
+        $imposePenalty = $this->createStub(ImposePenalty::class);
+        $imposePenalty->method('impose')->willThrowException($exception);
 
-        $command = $this->command($policeOfficer, $kernel);
+        $command = $this->command($imposePenalty, $kernel);
         $commandTester = new CommandTester($command);
 
         $commandTester->execute([
