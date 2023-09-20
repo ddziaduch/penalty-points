@@ -6,8 +6,6 @@ namespace ddziaduch\PenaltyPoints\Tests\Application;
 
 use ddziaduch\PenaltyPoints\Adapters\Secondary\FixedClock;
 use ddziaduch\PenaltyPoints\Application\ImposePenaltyService;
-use ddziaduch\PenaltyPoints\Application\Ports\Secondary\GetDriverFile;
-use ddziaduch\PenaltyPoints\Application\Ports\Secondary\StoreDriverFile;
 use ddziaduch\PenaltyPoints\Domain\DriverFile;
 use PHPUnit\Framework\TestCase;
 
@@ -29,17 +27,15 @@ final class ImposePenaltyServiceTest extends TestCase
 
         $clock = new FixedClock($now);
 
-        $getDriverFile = self::createStub(GetDriverFile::class);
-        $getDriverFile->method('get')->willReturn($driverFile);
-
-        $storeDriverFile = $this->createMock(StoreDriverFile::class);
-        $storeDriverFile->expects(self::exactly(3))->method('store')->with($driverFile);
+        $driverFiles = new InMemoryDriverFiles();
+        $driverFiles->store($driverFile);
 
         $imposePenaltyService = new ImposePenaltyService(
             $clock,
-            $getDriverFile,
-            $storeDriverFile,
+            $driverFiles,
+            $driverFiles,
         );
+
         $imposePenaltyService->impose(
             driverLicenseNumber: $driverFile->licenseNumber,
             penaltySeries: 'CS',
@@ -55,25 +51,29 @@ final class ImposePenaltyServiceTest extends TestCase
             isPaidOnSpot: true,
         );
 
-        $this->expectException(\DomainException::class); // it should store the penalty and throw the exception
-        $imposePenaltyService->impose(
-            driverLicenseNumber: $driverFile->licenseNumber,
-            penaltySeries: 'CS',
-            penaltyNumber: 789,
-            numberOfPenaltyPoints: 10,
-            isPaidOnSpot: false,
-        );
+        $this->expectException(\DomainException::class);
+        try {
+            $imposePenaltyService->impose(
+                driverLicenseNumber: $driverFile->licenseNumber,
+                penaltySeries: 'CS',
+                penaltyNumber: 789,
+                numberOfPenaltyPoints: 10,
+                isPaidOnSpot: false,
+            );
+        } finally {
+            self::assertFalse($driverFile->isDrivingLicenseValid($now));
+            self::assertSame(30, $driverFile->sumOfValidPenaltyPoints($now));
+        }
     }
 
     public function testDriverFileDoesNotExist(): void
     {
-        $getDriverFile = self::createStub(GetDriverFile::class);
-        $getDriverFile->method('get')->willThrowException(new \OutOfBoundsException());
+        $driverFiles = new InMemoryDriverFiles();
 
         $imposePenaltyService = new ImposePenaltyService(
             new FixedClock(new \DateTimeImmutable()),
-            $getDriverFile,
-            self::createStub(StoreDriverFile::class),
+            $driverFiles,
+            $driverFiles,
         );
 
         $this->expectException(\OutOfBoundsException::class);

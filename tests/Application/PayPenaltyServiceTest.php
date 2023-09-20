@@ -33,7 +33,7 @@ class PayPenaltyServiceTest extends TestCase
 
         $clock = new FixedClock($this->now);
 
-        $driverFiles = new InMemoryDriverFiles($clock);
+        $driverFiles = new InMemoryDriverFiles();
         $driverFiles->store($this->driverFile);
 
         $this->service = new PayPenaltyService($clock, $driverFiles);
