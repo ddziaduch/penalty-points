@@ -128,6 +128,7 @@ final class DriverFileTest extends TestCase
         }
 
         $this->expectException(\DomainException::class);
+
         try {
             $driverFile->imposePenalty(
                 series: self::PENALTY_SERIES,
