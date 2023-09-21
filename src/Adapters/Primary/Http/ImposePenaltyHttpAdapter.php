@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace ddziaduch\PenaltyPoints\Adapters\Primary\Http;
 
+use ddziaduch\PenaltyPoints\Application\DriverFileDoesNotExist;
 use ddziaduch\PenaltyPoints\Application\Ports\Primary\ImposePenalty;
+use ddziaduch\PenaltyPoints\Domain\PenaltyImposedButDriversLicenseIsNotValidAnymore;
 use Symfony\Component\HttpFoundation\Response;
 
 final readonly class ImposePenaltyHttpAdapter
@@ -28,7 +30,7 @@ final readonly class ImposePenaltyHttpAdapter
                 $numberOfPoints,
                 $isPaidOnSpot,
             );
-        } catch (\DomainException|\OutOfBoundsException $exception) {
+        } catch (DriverFileDoesNotExist|PenaltyImposedButDriversLicenseIsNotValidAnymore $exception) {
             return new Response($exception->getMessage(), Response::HTTP_BAD_REQUEST);
         }
 

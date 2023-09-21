@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Adapters\Primary\Http;
 
+use ddziaduch\PenaltyPoints\Application\DriverFileDoesNotExist;
 use ddziaduch\PenaltyPoints\Application\Ports\Primary\PayPenalty;
+use ddziaduch\PenaltyPoints\Domain\PenaltyAlreadyPaid;
+use ddziaduch\PenaltyPoints\Domain\PenaltyDoesNotExist;
 use ddziaduch\PenaltyPoints\Tests\Adapters\Primary\Cli\ImposePenaltyCliAdapterTest;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -69,6 +72,10 @@ final class PayPenaltyHttpAdapterTest extends WebTestCase
 
     public static function provideExceptions(): \Generator
     {
-        return ImposePenaltyCliAdapterTest::provideExceptions();
+        yield DriverFileDoesNotExist::class => [new DriverFileDoesNotExist(licenseNumber: 'ABC123')];
+
+        yield PenaltyDoesNotExist::class => [new PenaltyDoesNotExist(series: 'CD', number: 567)];
+
+        yield PenaltyAlreadyPaid::class => [new PenaltyAlreadyPaid(series: 'XX', number: 404)];
     }
 }

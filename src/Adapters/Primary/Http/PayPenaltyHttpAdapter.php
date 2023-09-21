@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace ddziaduch\PenaltyPoints\Adapters\Primary\Http;
 
+use ddziaduch\PenaltyPoints\Application\DriverFileDoesNotExist;
 use ddziaduch\PenaltyPoints\Application\Ports\Primary\PayPenalty;
+use ddziaduch\PenaltyPoints\Domain\PenaltyAlreadyPaid;
+use ddziaduch\PenaltyPoints\Domain\PenaltyDoesNotExist;
 use Symfony\Component\HttpFoundation\Response;
 
 final readonly class PayPenaltyHttpAdapter
@@ -24,7 +27,7 @@ final readonly class PayPenaltyHttpAdapter
                 $penaltySeries,
                 $penaltyNumber,
             );
-        } catch (\DomainException|\OutOfBoundsException $exception) {
+        } catch (DriverFileDoesNotExist|PenaltyDoesNotExist|PenaltyAlreadyPaid $exception) {
             return new Response($exception->getMessage(), Response::HTTP_BAD_REQUEST);
         }
 

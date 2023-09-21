@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace ddziaduch\PenaltyPoints\Tests\Adapters\Primary\Cli;
 
+use ddziaduch\PenaltyPoints\Application\DriverFileDoesNotExist;
 use ddziaduch\PenaltyPoints\Application\Ports\Primary\ImposePenalty;
+use ddziaduch\PenaltyPoints\Domain\PenaltyImposedButDriversLicenseIsNotValidAnymore;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -74,9 +76,15 @@ final class ImposePenaltyCliAdapterTest extends KernelTestCase
 
     public static function provideExceptions(): \Generator
     {
-        yield \DomainException::class => [new \DomainException('something terrible happened')];
+        yield DriverFileDoesNotExist::class => [new DriverFileDoesNotExist(licenseNumber: 'ABC123')];
 
-        yield \OutOfBoundsException::class => [new \OutOfBoundsException('out of range sir!')];
+        yield PenaltyImposedButDriversLicenseIsNotValidAnymore::class => [
+            new PenaltyImposedButDriversLicenseIsNotValidAnymore(
+                penaltySeries: 'CD',
+                penaltyNumber: 12345,
+                driversLicenseNumber: 'ABC123'
+            ),
+        ];
     }
 
     private function command(ImposePenalty $policeOfficer, KernelInterface $kernel): Command
