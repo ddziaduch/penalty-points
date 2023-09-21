@@ -14,7 +14,7 @@ final class DriverFile
         public readonly \DateTimeImmutable $examPassedAt,
     ) {}
 
-    /** @throws \DomainException */
+    /** @throws PenaltyImposedButDriversLicenseIsNotValidAnymore */
     public function imposePenalty(
         string $series,
         int $number,
@@ -29,13 +29,17 @@ final class DriverFile
         $this->penalties[] = $penalty;
 
         if (!$this->isDrivingLicenseValid($occurredAt)) {
-            throw new \DomainException('Penalty imposed, but the driver\'s license is not valid anymore');
+            throw new PenaltyImposedButDriversLicenseIsNotValidAnymore(
+                $penalty->series,
+                $penalty->number,
+                $this->licenseNumber,
+            );
         }
     }
 
     /**
-     * @throws \OutOfBoundsException
-     * @throws \DomainException
+     * @throws PenaltyDoesNotExist
+     * @throws PenaltyAlreadyPaid
      */
     public function payPenalty(
         string $series,
@@ -50,7 +54,7 @@ final class DriverFile
             }
         }
 
-        throw new \OutOfBoundsException('Penalty now found');
+        throw new PenaltyDoesNotExist($series, $number);
     }
 
     public function isDrivingLicenseValid(\DateTimeImmutable $now): bool
