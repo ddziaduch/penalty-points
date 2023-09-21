@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ddziaduch\PenaltyPoints\Tests\Domain;
 
 use ddziaduch\PenaltyPoints\Domain\Penalty;
+use ddziaduch\PenaltyPoints\Domain\PenaltyAlreadyPaid;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -78,7 +79,7 @@ class PenaltyTest extends TestCase
             numberOfPoints: 10,
         );
 
-        $this->expectException(\DomainException::class);
+        $this->expectException(PenaltyAlreadyPaid::class);
         $penalty->pay(payedAt: new \DateTimeImmutable());
     }
 
