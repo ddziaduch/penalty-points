@@ -9,6 +9,7 @@ use ddziaduch\PenaltyPoints\Adapters\Secondary\InMemoryDriverFiles;
 use ddziaduch\PenaltyPoints\Application\DriverFileDoesNotExist;
 use ddziaduch\PenaltyPoints\Application\ImposePenaltyService;
 use ddziaduch\PenaltyPoints\Domain\DriverFile;
+use ddziaduch\PenaltyPoints\Domain\PenaltyImposedButDriversLicenseIsNotValidAnymore;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -53,7 +54,7 @@ final class ImposePenaltyServiceTest extends TestCase
             isPaidOnSpot: true,
         );
 
-        $this->expectException(\DomainException::class);
+        $this->expectException(PenaltyImposedButDriversLicenseIsNotValidAnymore::class);
         try {
             $service->impose(
                 driverLicenseNumber: $driverFile->licenseNumber,
