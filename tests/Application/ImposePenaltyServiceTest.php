@@ -32,20 +32,20 @@ final class ImposePenaltyServiceTest extends TestCase
         $driverFiles = new InMemoryDriverFiles();
         $driverFiles->store($driverFile);
 
-        $imposePenaltyService = new ImposePenaltyService(
+        $service = new ImposePenaltyService(
             $clock,
             $driverFiles,
             $driverFiles,
         );
 
-        $imposePenaltyService->impose(
+        $service->impose(
             driverLicenseNumber: $driverFile->licenseNumber,
             penaltySeries: 'CS',
             penaltyNumber: 123,
             numberOfPenaltyPoints: 10,
             isPaidOnSpot: false,
         );
-        $imposePenaltyService->impose(
+        $service->impose(
             driverLicenseNumber: $driverFile->licenseNumber,
             penaltySeries: 'CS',
             penaltyNumber: 456,
@@ -55,7 +55,7 @@ final class ImposePenaltyServiceTest extends TestCase
 
         $this->expectException(\DomainException::class);
         try {
-            $imposePenaltyService->impose(
+            $service->impose(
                 driverLicenseNumber: $driverFile->licenseNumber,
                 penaltySeries: 'CS',
                 penaltyNumber: 789,
@@ -72,14 +72,14 @@ final class ImposePenaltyServiceTest extends TestCase
     {
         $driverFiles = new InMemoryDriverFiles();
 
-        $imposePenaltyService = new ImposePenaltyService(
+        $service = new ImposePenaltyService(
             new FixedClock(new \DateTimeImmutable()),
             $driverFiles,
             $driverFiles,
         );
 
         $this->expectException(DriverFileDoesNotExist::class);
-        $imposePenaltyService->impose(
+        $service->impose(
             driverLicenseNumber: 'xyz123',
             penaltySeries: 'BA',
             penaltyNumber: 999,

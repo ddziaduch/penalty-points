@@ -20,7 +20,7 @@ class PayPenaltyServiceTest extends TestCase
 {
     private \DateTimeImmutable $now;
     private DriverFile $driverFile;
-    private PayPenaltyService $payPenaltyService;
+    private PayPenaltyService $service;
     private InMemoryDriverFiles $driverFiles;
 
     protected function setUp(): void
@@ -38,7 +38,7 @@ class PayPenaltyServiceTest extends TestCase
         $this->driverFiles = new InMemoryDriverFiles();
         $this->driverFiles->store($this->driverFile);
 
-        $this->payPenaltyService = new PayPenaltyService($clock, $this->driverFiles, $this->driverFiles);
+        $this->service = new PayPenaltyService($clock, $this->driverFiles, $this->driverFiles);
     }
 
     public function testPayingPenalty(): void
@@ -54,7 +54,7 @@ class PayPenaltyServiceTest extends TestCase
             isPaidOnSpot: false,
         );
 
-        $this->payPenaltyService->pay($this->driverFile->licenseNumber, $series, $number);
+        $this->service->pay($this->driverFile->licenseNumber, $series, $number);
 
         $driverFileFromStorage = $this->driverFiles->get($this->driverFile->licenseNumber);
 
@@ -65,12 +65,12 @@ class PayPenaltyServiceTest extends TestCase
     public function testPenaltyDoesNotExist(): void
     {
         $this->expectException(\OutOfBoundsException::class);
-        $this->payPenaltyService->pay($this->driverFile->licenseNumber, 'XX', 9999);
+        $this->service->pay($this->driverFile->licenseNumber, 'XX', 9999);
     }
 
     public function testDriverFileDoesNotExist(): void
     {
         $this->expectException(DriverFileDoesNotExist::class);
-        $this->payPenaltyService->pay('98765', 'XX', 9999);
+        $this->service->pay('98765', 'XX', 9999);
     }
 }
