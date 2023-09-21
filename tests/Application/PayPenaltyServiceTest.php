@@ -6,6 +6,7 @@ namespace ddziaduch\PenaltyPoints\Tests\Application;
 
 use ddziaduch\PenaltyPoints\Adapters\Secondary\FixedClock;
 use ddziaduch\PenaltyPoints\Adapters\Secondary\InMemoryDriverFiles;
+use ddziaduch\PenaltyPoints\Application\DriverFileDoesNotExist;
 use ddziaduch\PenaltyPoints\Application\PayPenaltyService;
 use ddziaduch\PenaltyPoints\Domain\DriverFile;
 use PHPUnit\Framework\TestCase;
@@ -20,6 +21,7 @@ class PayPenaltyServiceTest extends TestCase
     private \DateTimeImmutable $now;
     private DriverFile $driverFile;
     private PayPenaltyService $service;
+    private InMemoryDriverFiles $driverFiles;
 
     protected function setUp(): void
     {
@@ -33,10 +35,10 @@ class PayPenaltyServiceTest extends TestCase
 
         $clock = new FixedClock($this->now);
 
-        $driverFiles = new InMemoryDriverFiles();
-        $driverFiles->store($this->driverFile);
+        $this->driverFiles = new InMemoryDriverFiles();
+        $this->driverFiles->store($this->driverFile);
 
-        $this->service = new PayPenaltyService($clock, $driverFiles);
+        $this->service = new PayPenaltyService($clock, $this->driverFiles, $this->driverFiles);
     }
 
     public function testPayingPenalty(): void
@@ -47,12 +49,28 @@ class PayPenaltyServiceTest extends TestCase
         $this->driverFile->imposePenalty(
             series: $series,
             number: $number,
-            occurredAt: new \DateTimeImmutable(),
+            occurredAt: $this->now,
             numberOfPoints: 10,
-            isPaidOnSpot: true,
+            isPaidOnSpot: false,
         );
 
-        $this->expectException(\DomainException::class);
         $this->service->pay($this->driverFile->licenseNumber, $series, $number);
+
+        $driverFileFromStorage = $this->driverFiles->get($this->driverFile->licenseNumber);
+
+        $this->expectException(\DomainException::class);
+        $driverFileFromStorage->payPenalty($series, $number, $this->now);
+    }
+
+    public function testPenaltyDoesNotExist(): void
+    {
+        $this->expectException(\OutOfBoundsException::class);
+        $this->service->pay($this->driverFile->licenseNumber, 'XX', 9999);
+    }
+
+    public function testDriverFileDoesNotExist(): void
+    {
+        $this->expectException(DriverFileDoesNotExist::class);
+        $this->service->pay('98765', 'XX', 9999);
     }
 }
