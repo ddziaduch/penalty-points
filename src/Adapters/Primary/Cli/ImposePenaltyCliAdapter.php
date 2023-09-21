@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace ddziaduch\PenaltyPoints\Adapters\Primary\Cli;
 
+use ddziaduch\PenaltyPoints\Application\DriverFileDoesNotExist;
 use ddziaduch\PenaltyPoints\Application\Ports\Primary\ImposePenalty;
+use ddziaduch\PenaltyPoints\Domain\PenaltyImposedButDriversLicenseIsNotValidAnymore;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -75,7 +77,7 @@ final class ImposePenaltyCliAdapter extends Command
                 (int) $numberOfPoints,
                 (bool) $isPaidOnSpot,
             );
-        } catch (\DomainException|\OutOfBoundsException $exception) {
+        } catch (DriverFileDoesNotExist|PenaltyImposedButDriversLicenseIsNotValidAnymore $exception) {
             $output->writeln($exception->getMessage());
 
             return self::FAILURE;
