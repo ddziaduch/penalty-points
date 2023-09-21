@@ -36,7 +36,7 @@ final class Penalty
     public function pay(\DateTimeImmutable $payedAt): void
     {
         if ($this->isPaid()) {
-            throw new \DomainException('Penalty already paid');
+            throw new PenaltyAlreadyPaid($this->series, $this->number);
         }
 
         $this->payedAt = $payedAt;

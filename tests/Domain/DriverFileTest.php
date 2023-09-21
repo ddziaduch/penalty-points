@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace ddziaduch\PenaltyPoints\Tests\Domain;
 
 use ddziaduch\PenaltyPoints\Domain\DriverFile;
+use ddziaduch\PenaltyPoints\Domain\PenaltyDoesNotExist;
+use ddziaduch\PenaltyPoints\Domain\PenaltyImposedButDriversLicenseIsNotValidAnymore;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -127,7 +129,7 @@ final class DriverFileTest extends TestCase
             );
         }
 
-        $this->expectException(\DomainException::class);
+        $this->expectException(PenaltyImposedButDriversLicenseIsNotValidAnymore::class);
 
         try {
             $driverFile->imposePenalty(
@@ -220,7 +222,7 @@ final class DriverFileTest extends TestCase
         $now = new \DateTimeImmutable();
         $driverFile = new DriverFile(self::LICENSE_NUMBER, $now->modify('-36 months'));
 
-        $this->expectException(\OutOfBoundsException::class);
+        $this->expectException(PenaltyDoesNotExist::class);
         $driverFile->payPenalty(series: self::PENALTY_SERIES, number: 12345, payedAt: $now->modify('-5 months'));
     }
 }
