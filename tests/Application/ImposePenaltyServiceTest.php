@@ -6,6 +6,7 @@ namespace ddziaduch\PenaltyPoints\Tests\Application;
 
 use ddziaduch\PenaltyPoints\Adapters\Secondary\FixedClock;
 use ddziaduch\PenaltyPoints\Adapters\Secondary\InMemoryDriverFiles;
+use ddziaduch\PenaltyPoints\Application\DriverFileDoesNotExist;
 use ddziaduch\PenaltyPoints\Application\ImposePenaltyService;
 use ddziaduch\PenaltyPoints\Domain\DriverFile;
 use PHPUnit\Framework\TestCase;
@@ -22,8 +23,8 @@ final class ImposePenaltyServiceTest extends TestCase
         $now = new \DateTimeImmutable();
 
         $driverFile = new DriverFile(
-            'lorem-ipsum',
-            $now->modify('-24 months'),
+            licenseNumber: 'lorem-ipsum',
+            examPassedAt: $now->modify('-24 months'),
         );
 
         $clock = new FixedClock($now);
@@ -78,7 +79,7 @@ final class ImposePenaltyServiceTest extends TestCase
             $driverFiles,
         );
 
-        $this->expectException(\OutOfBoundsException::class);
+        $this->expectException(DriverFileDoesNotExist::class);
         $imposePenaltyService->impose(
             driverLicenseNumber: 'xyz123',
             penaltySeries: 'BA',
