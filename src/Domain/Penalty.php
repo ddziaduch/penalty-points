@@ -32,7 +32,7 @@ final class Penalty
         return new self($series, $number, $occurredAt, $occurredAt, $numberOfPoints);
     }
 
-    /** @throws \DomainException */
+    /** @throws PenaltyAlreadyPaid */
     public function pay(\DateTimeImmutable $payedAt): void
     {
         if ($this->isPaid()) {
