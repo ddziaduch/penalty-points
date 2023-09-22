@@ -39,8 +39,9 @@ final class ImposePenaltyCliAdapterTest extends KernelTestCase
             self::PENALTY_POINTS,
             self::IS_PAID_ON_SPOT,
         );
+        self::getContainer()->set(ImposePenalty::class, $imposePenalty);
 
-        $command = $this->command($imposePenalty, $kernel);
+        $command = $this->command($kernel);
         $commandTester = new CommandTester($command);
 
         $commandTester->execute([
@@ -59,8 +60,9 @@ final class ImposePenaltyCliAdapterTest extends KernelTestCase
 
         $imposePenalty = $this->createStub(ImposePenalty::class);
         $imposePenalty->method('impose')->willThrowException($exception);
+        self::getContainer()->set(ImposePenalty::class, $imposePenalty);
 
-        $command = $this->command($imposePenalty, $kernel);
+        $command = $this->command($kernel);
         $commandTester = new CommandTester($command);
 
         $commandTester->execute([
@@ -87,10 +89,8 @@ final class ImposePenaltyCliAdapterTest extends KernelTestCase
         ];
     }
 
-    private function command(ImposePenalty $policeOfficer, KernelInterface $kernel): Command
+    private function command(KernelInterface $kernel): Command
     {
-        self::getContainer()->set(ImposePenalty::class, $policeOfficer);
-
         return (new Application($kernel))->find('police-officer:impose-penalty');
     }
 }
